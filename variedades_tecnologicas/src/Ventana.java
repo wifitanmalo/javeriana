@@ -10,6 +10,9 @@ public class Ventana extends JFrame
     // medidas de la ventana
     int width = 500, height = 500;
 
+    // mensaje de error
+    JLabel mensaje_error = new JLabel("Ingrese un numero positivo", SwingConstants.CENTER);
+
     // crea los paneles a utilizar
     private JPanel menu_principal = new JPanel();
     private JPanel efectivo = new JPanel();
@@ -188,7 +191,7 @@ public class Ventana extends JFrame
         titulo.setFont(new Font("Verdana", 0, 22));
         efectivo.add(titulo);
 
-        // crear cajas de texto
+        // crear caja de texto
         JTextField caja_efectivo = new JTextField();
         caja_efectivo.setBounds( ((width-120) / 2),
                                 distancia_y(titulo),
@@ -199,21 +202,40 @@ public class Ventana extends JFrame
 
         // boton para ingresar el efectivo ----------
         JButton pago = new JButton("Ingresar");
-        pago.setBounds(( (width-120)/2), distancia_y(caja_efectivo), 120, 40);
-        pago.setFont(new Font("Verdana", 1, 16));
+        pago.setBounds(( (width-120)/2),
+                        distancia_y(caja_efectivo),
+                        120,
+                        40);
+                pago.setFont(new Font("Verdana", 1, 16));
         efectivo.add(pago);
+
+        mensaje_error(pago, efectivo, false);
 
         // capturar evento del boton de pago
         ActionListener pagar = new ActionListener()
         {
             @Override
-            public void actionPerformed(ActionEvent e)
+            public void actionPerformed(ActionEvent evento)
             {
-                efectivo.setVisible(false);
+                try
+                {
+                    int cantidad = Integer.parseInt(caja_efectivo.getText());
 
-                // limpia la caja de texto
-                caja_efectivo.setText("");
-                menu_principal.setVisible(true);
+                    // si la cantidad es negativa lanza un error
+                    if(cantidad < 1)
+                    {
+                        throw new NumberFormatException("----- numero negativo -----");
+                    }
+
+                    efectivo.setVisible(false);
+                    caja_efectivo.setText("");
+                    menu_principal.setVisible(true);
+                }
+                catch (NumberFormatException error)
+                {
+                    System.out.println("----- valor invalido -----");
+                    mensaje_error(pago, efectivo, true);
+                }
             }
         };
         pago.addActionListener(pagar);
@@ -284,14 +306,48 @@ public class Ventana extends JFrame
             @Override
             public void actionPerformed(ActionEvent e)
             {
-                menu_operador.setVisible(false);
-                // limpia la caja de texto
-                caja_cantidad.setText("");
-                panel_efectivo();
-                efectivo.setVisible(true);
+                try
+                {
+                    int cantidad = Integer.parseInt(caja_cantidad.getText());
+
+                    // si la cantidad es negativa lanza un error
+                    if(cantidad < 1)
+                    {
+                        throw new NumberFormatException("----- numero negativo -----");
+                    }
+
+                    mensaje_error(confirmar, menu_operador, false);
+
+                    caja_cantidad.setText("");
+                    menu_operador.setVisible(false);
+
+                    panel_efectivo();
+                    efectivo.setVisible(true);
+                }
+                catch (NumberFormatException error)
+                {
+                    System.out.println("----- valor invalido -----");
+                    mensaje_error(confirmar, menu_operador, true);
+                }
             }
         };
+        mensaje_error(confirmar, menu_operador, false);
         confirmar.addActionListener(pago);
+    }
+
+
+    // metodo para agregar un mensaje de error numerico
+    public void mensaje_error(JButton boton, JPanel panel, boolean mostrar)
+    {
+        // texto de error
+        mensaje_error.setBounds(((width-500) / 2),
+                distancia_y(boton),
+                500,
+                30); // posicion y tamaño
+        mensaje_error.setForeground(Color.RED); // color del texto
+        mensaje_error.setFont(new Font("Verdana", 1, 16));
+        mensaje_error.setVisible(mostrar);
+        panel.add(mensaje_error);
     }
 }
 
