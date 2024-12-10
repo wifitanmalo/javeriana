@@ -22,7 +22,8 @@ public class Negocio
 
 
     // -------------------- constructor del negocio --------------------
-    public Negocio(int costo_mpleado, int costo_energia) {
+    public Negocio(int costo_mpleado, int costo_energia)
+    {
         // lista de los operadores
         lista_operador = new ArrayList<>();
 
@@ -54,7 +55,7 @@ public class Negocio
     // metodo para usar el objeto del operador
     public void usar_opera(int posicion)
     {
-        opera = lista_operador.get(posicion - 1);
+        opera = lista_operador.get(posicion);
     }
 
 
@@ -205,10 +206,16 @@ public class Negocio
             {
                 venta = (area_can * this.fotoP.get_venta_cm_afiche()) + (area_can * this.fotoP.get_venta_afiche());
                 costo = (area_can * this.fotoP.get_costo_cm_afiche()) + (area_can * this.fotoP.get_costo_afiche());
-            } else if (impresion == 2) // plano
+            }
+            else if (impresion == 2) // plano
             {
                 venta = (area_can * this.fotoP.get_venta_cm_plano()) + (area_can * this.fotoP.get_venta_plano());
                 costo = (area_can * this.fotoP.get_costo_cm_plano()) + (area_can * this.fotoP.get_costo_plano());
+            }
+            else
+            {
+                venta = 0;
+                costo = 0;
             }
         }
         else
@@ -218,10 +225,16 @@ public class Negocio
             {
                 venta = area_can * this.fotoP.getValorVentaHC();
                 costo = area_can * this.fotoP.getCostoHC();
-            } else if (tinta == 2) // blanco y negro
+            }
+            else if (tinta == 2) // blanco y negro
             {
                 venta = area_can * this.fotoP.getValorVentaHBN();
                 costo = area_can * this.fotoP.getCostoHBN();
+            }
+            else
+            {
+                venta = 0;
+                costo = 0;
             }
         }
     }
