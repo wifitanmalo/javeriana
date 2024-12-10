@@ -1,73 +1,80 @@
 import java.io.*;
 import java.util.ArrayList;
+import java.util.Objects;
 
-public class Negocio {
+public class Negocio
+{
+    // objetos de los servicios
     private Fotocopiadora fotoP;
     private Operador opera;
-    private ArrayList<Operador> lista_operador;
 
+    // listas de los servicios
+    private ArrayList<Operador> lista_operador;
+    private ArrayList<Fotocopiadora> foto_lista;
+
+    // rendimiento de ganancia/produccion
     private int venta;
     private int costo;
 
-    private ArrayList<Fotocopiadora> foto_lista;
-    private int constoEnergiaDia;
-    private int costoEmpleadoDia;
+    // costos diarios de produccion
+    private int costo_energia;
+    private int costo_mpleado;
+
 
     // -------------------- constructor del negocio --------------------
-    public Negocio(int costoEmpleadoDia, int constoEnergiaDia) {
-        // -------------------- operadores --------------------
+    public Negocio(int costo_mpleado, int costo_energia) {
+        // lista de los operadores
         lista_operador = new ArrayList<>();
 
-        // -------------------- fotocopiadoras --------------------
+        // lista de las fotocopiadoras
         foto_lista = new ArrayList<>();
         // el objeto recibe el valor de la fotocopiadora predeterminada
 
-        // -------------------- costos diarios del negocio --------------------
-        this.costoEmpleadoDia = costoEmpleadoDia;
-        this.constoEnergiaDia = constoEnergiaDia;
+        // costos diarios del negocio
+        this.costo_mpleado = costo_mpleado;
+        this.costo_energia = costo_energia;
     }
+
 
     // ------------------------ objeto de operador ------------------------
     public void set_opera(Operador opera) {
         this.opera = opera;
     }
-
     public Operador get_opera() {
         return opera;
-    }
-
-    public ArrayList<Operador> getLisOper() {
-        return lista_operador;
     }
 
     public void setLisOper(ArrayList<Operador> lisOper) {
         this.lista_operador = lisOper;
     }
+    public ArrayList<Operador> getLisOper() {
+        return lista_operador;
+    }
 
     // metodo para usar el objeto del operador
-    public void usar_opera(int posicion) {
+    public void usar_opera(int posicion)
+    {
         opera = lista_operador.get(posicion - 1);
     }
+
 
     // ------------------------ objeto de fotocopiadora ------------------------
     public void setFotoP(Fotocopiadora fotoP) {
         this.fotoP = fotoP;
     }
-
     public Fotocopiadora getFotoP() {
         return fotoP;
     }
 
-
-    public void set_fotolista(ArrayList<Fotocopiadora> lista_fotocopiadora) {
+    public void set_fotolista(ArrayList<Fotocopiadora> lista_fotocopiadora)
+    {
         this.foto_lista = lista_fotocopiadora;
     }
-
     public ArrayList<Fotocopiadora> get_fotolista() {
         return foto_lista;
     }
 
-    // metodo para usar el objeto de la fotocopiadora
+    // metodo para utilizar el objeto de la fotocopiadora
     public void usar_foto(int posicion) {
         fotoP = foto_lista.get(posicion - 1);
     }
@@ -76,8 +83,13 @@ public class Negocio {
 // ------------------------ CRUD DE OPERADOR ------------------------
 
     // funcion para CREAR un operador
-    public void crear_operador(String nombre, int costo_minuto, int valor_venta, int costo_sim, int venta_sim) {
-        lista_operador.add(new Operador(nombre, costo_minuto, valor_venta, costo_sim, venta_sim));
+    public void crear_operador(String nombre, int costo_minuto, int valor_venta, int costo_sim, int venta_sim)
+    {
+        lista_operador.add(new Operador(nombre,
+                                        costo_minuto,
+                                        valor_venta,
+                                        costo_sim,
+                                        venta_sim));
     }
 
     // funcion para MODIFICAR un operador
@@ -136,42 +148,58 @@ public class Negocio {
         foto_lista.remove(posicion - 1);
     }
 
-    // registrar la ventas en el negocio
-    public boolean registrar(int servicio, int efectivo, int valor_total, int costo) {
-        if (servicio == 1) {
-            if (valor_total == efectivo) {
+
+// registrar la venta en el negocio
+    public boolean registrar(int servicio, int efectivo, int valor_total, int costo)
+    {
+        if (servicio == 1) // minutos
+        {
+            if (valor_total == efectivo)
+            {
                 this.opera.set_recolectado(efectivo);
                 this.opera.set_produccion(costo);
-            } else {
+            }
+            else
+            {
                 return false;
             }
-        } else {
-            if (valor_total == efectivo) {
+        }
+        else // fotocopiadoras
+        {
+            if (valor_total == efectivo)
+            {
                 this.fotoP.set_recolectado(efectivo);
                 this.fotoP.set_produccion(costo);
-            } else {
+            }
+            else
+            {
                 return false;
             }
         }
         return true;
     }
 
-// ---------- funcion para conocer y obtener los valores totales ----------
 
-    // total de los minutos
-    public void set_total(int opcion, int cantidad) {
-        if (opcion == 1) {
+// total de los minutos
+    public void set_total(int opcion, int cantidad)
+    {
+        if (opcion == 1) // venta de minutos
+        {
             venta = cantidad * this.opera.get_venta();
             costo = cantidad * this.opera.get_costo();
-        } else {
+        }
+        else // venta de SIM Card
+        {
             venta = cantidad * this.opera.get_venta_sim();
             costo = cantidad * this.opera.get_costo_sim();
         }
     }
 
-    // total de las fotocopias
-    public void set_total(int numero_foto, int tinta, int area_can, int impresion) {
-        if (numero_foto == 3) {
+
+// total de las fotocopias
+    public void set_total(String nombre, int tinta, int area_can, int impresion) {
+        if (Objects.equals(nombre, "Plotter"))
+        {
             // formula = (area * venta por centimetro) + (area * venta por impresion)
             if (impresion == 1) // afiche
             {
@@ -182,8 +210,10 @@ public class Negocio {
                 venta = (area_can * this.fotoP.get_venta_cm_plano()) + (area_can * this.fotoP.get_venta_plano());
                 costo = (area_can * this.fotoP.get_costo_cm_plano()) + (area_can * this.fotoP.get_costo_plano());
             }
-        } else {
-            // formula = cantidad * venta de hoja (color/blanco y negro)
+        }
+        else
+        {
+            // formula = cantidad * venta de hoja
             if (tinta == 1) // color
             {
                 venta = area_can * this.fotoP.getValorVentaHC();
@@ -195,40 +225,41 @@ public class Negocio {
             }
         }
     }
-
     public int get_venta() {
         return venta;
     }
-
     public int get_costo() {
         return costo;
     }
 
-    // -------------------- metodos para definir y obtener la deuda diaria del negocio --------------------
-    public void setConstoEnergiaDia(int constoEnergiaDia) {
-        this.constoEnergiaDia = constoEnergiaDia;
+
+// metodos para definir y obtener la deuda diaria del negocio
+    public void setCosto_energia(int costo_energia) {
+        this.costo_energia = costo_energia;
+    }
+    public int getCosto_energia() {
+        return costo_energia;
     }
 
-    public int getConstoEnergiaDia() {
-        return constoEnergiaDia;
+    public void setCosto_mpleado(int costo_mpleado) {
+        this.costo_mpleado = costo_mpleado;
     }
-
-    public void setCostoEmpleadoDia(int costoEmpleadoDia) {
-        this.costoEmpleadoDia = costoEmpleadoDia;
-    }
-
-    public int getCostoEmpleadoDia() {
-        return costoEmpleadoDia;
+    public int getCosto_mpleado() {
+        return costo_mpleado;
     }
 
 
-    // -------------------- funcion para cargar los operadores --------------------
+// -------------------- funcion para cargar los operadores --------------------
     public void cargar_operadores() {
-        try {
-            BufferedReader reader = new BufferedReader(new FileReader("operadores.txt"));
+        try
+        {
+            BufferedReader leer = new BufferedReader(new FileReader("operadores.txt"));
             String line;
-            while ((line = reader.readLine()) != null) {
-                String[] datos = line.split(",");  // Suponiendo que los datos están separados por comas
+            while ((line = leer.readLine()) != null)
+            {
+                // separa los datos por comas
+                String[] datos = line.split(",");
+
                 String nombre = datos[0];
                 int costo = Integer.parseInt(datos[1]);
                 int valor_venta = Integer.parseInt(datos[2]);
@@ -236,19 +267,23 @@ public class Negocio {
                 int valor_sim = Integer.parseInt(datos[4]);
 
                 Operador nuevo = new Operador(nombre, costo, valor_venta, costo_sim, valor_sim);
-                this.lista_operador.add(nuevo);  // Agrega la nueva fotocopiadora a la lista
+                this.lista_operador.add(nuevo); // agrega el nuevo operador a la lista
             }
-            reader.close();
+            leer.close();
             opera = lista_operador.get(0);
-        } catch (IOException e) {
-            e.printStackTrace();
+        }
+        catch (IOException error)
+        {
+            System.out.println(error.getMessage());
         }
     }
 
 
-    // -------------------- funcion para cargar las impresoras --------------------
-    public void cargar_impresoras() {
-        try {
+// funcion para cargar las impresoras
+    public void cargar_impresoras()
+    {
+        try
+        {
             BufferedReader reader = new BufferedReader(new FileReader("impresoras.txt"));
             String line;
             while ((line = reader.readLine()) != null)
@@ -282,18 +317,19 @@ public class Negocio {
                                                         consumo_negro,
                                                         consumo_ci_am,
                                                         consumo_magenta);
-                this.foto_lista.add(nueva);  // Agrega la nueva fotocopiadora a la lista
+                this.foto_lista.add(nueva);  // agrega la nueva fotocopiadora a la lista
             }
             reader.close();
             fotoP = foto_lista.get(0);
         }
-        catch (IOException e)
+        catch (IOException error)
         {
-            e.printStackTrace();
+            System.out.println(error.getMessage());
         }
     }
 
-// -------------------- metodo para escribir en el archivo de las impresoras --------------------
+
+// metodo para escribir en el archivo de las impresoras
     public void escribir_impresora(int impresora, int cantidad, int tinta)
     {
         String archivo = "impresoras.txt";
@@ -317,8 +353,8 @@ public class Negocio {
                         + foto_lista.get(posicion).getCostoHC()
                         + ",");
 
-            // disminuye el porcentaje de la tinta a utilizar
-                if( (posicion+1) == impresora)
+                // disminuye el porcentaje de la tinta a utilizar
+                if((posicion+1) == impresora)
                 {
                     if(tinta == 1)
                     {
@@ -355,7 +391,7 @@ public class Negocio {
                             + ",");
                 }
 
-            // consumo de cada tinta por impresion
+                // consumo de cada tinta por impresion
                 linea += (foto_lista.get(posicion).get_consumo_negro()
                         + ","
                         + foto_lista.get(posicion).get_consumo_ci_am()
@@ -365,7 +401,7 @@ public class Negocio {
                 System.out.println("\n MAMASITA RICA" + linea);
             }
 
-            // Escribir las líneas de vuelta al archivo
+            // escribe las líneas de vuelta al archivo
             try (BufferedWriter escribir = new BufferedWriter(new FileWriter(archivo)))
             {
                 for (String l : lineas)
@@ -376,13 +412,14 @@ public class Negocio {
             }
             System.out.println("----- la línea ha sido modificada exitosamente -----");
         }
-        catch(IOException e)
+        catch(IOException error)
         {
-            System.out.println(e.getMessage());
+            System.out.println(error.getMessage());
         }
     }
 
-    // metodo para redondear numeros en dos decimales
+
+// metodo para redondear numeros en dos decimales
     public double redondear(double numero)
     {
         return Math.round(numero*100) / 100;

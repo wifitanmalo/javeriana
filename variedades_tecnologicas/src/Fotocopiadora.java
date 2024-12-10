@@ -33,7 +33,7 @@ public class Fotocopiadora
     private int produccion;
 
 
-// -------------------- constructor predeterminado --------------------
+// ---------- constructor predeterminado ----------
     public Fotocopiadora(String nombre,
                          int costoHBN,
                          int costoHC,
@@ -64,7 +64,8 @@ public class Fotocopiadora
         this.consumo_magenta = consumo_magenta;
     }
 
-// -------------------- constructor para la impresora de planos --------------------
+
+// ---------- constructor para el plotter ----------
     public Fotocopiadora(String nombre,
                          int costo_cm_plano,
                          int costo_cm_afiche,
@@ -103,7 +104,7 @@ public class Fotocopiadora
     }
 
 
-// -------------------- metodos predeterminados de las fotocopiadoras --------------------
+// metodos predeterminados de las fotocopiadoras
     public void set_nombre(String nombre)
     {
         this.nombre = nombre;
@@ -149,7 +150,8 @@ public class Fotocopiadora
         return valorVentaHBN;
     }
 
-// -------------------- metodos para definir y obtener los costos por centimetro --------------------
+
+// metodos para definir y obtener los costos por centimetro
     public void set_costo_cm_plano(int costo_cm_plano) {
         this.costo_cm_plano = costo_cm_plano;
     }
@@ -164,7 +166,8 @@ public class Fotocopiadora
         return costo_cm_afiche;
     }
 
-// -------------------- metodos para definir y obtener los valores de venta por centimetro --------------------
+
+// metodos para definir y obtener los valores de venta por centimetro
     public void set_venta_cm_plano(int venta_cm_plano) {
         this.venta_cm_plano = venta_cm_plano;
     }
@@ -179,7 +182,8 @@ public class Fotocopiadora
         return venta_cm_afiche;
     }
 
-// -------------------- metodos para definir y obtener los costos por tipo de impresion --------------------
+
+// metodos para definir y obtener los costos por tipo de impresion
     public void set_costo_afiche(int costo_afiche) {
         this.costo_afiche = costo_afiche;
     }
@@ -194,7 +198,8 @@ public class Fotocopiadora
         return costo_plano;
     }
 
-// -------------------- metodos para definir y obtener los valores de venta por tipo de impresion --------------------
+
+// metodos para definir y obtener los valores de venta por tipo de impresion
     public void set_venta_afiche(int venta_afiche) {
         this.venta_afiche = venta_afiche;
     }
@@ -209,7 +214,8 @@ public class Fotocopiadora
         return venta_plano;
     }
 
-// -------------------- metodos para adicionar el valor recolectado del dia --------------------
+
+// metodos para adicionar el valor recolectado del dia
     public void set_recolectado(int efectivo)
     {
         this.recolectado = this.recolectado + efectivo;
@@ -219,7 +225,8 @@ public class Fotocopiadora
         return recolectado;
     }
 
-// -------------------- metodos para adicionar el costo de produccion del dia --------------------
+
+// metodos para adicionar el costo de produccion del dia
     public void set_produccion(int costo)
     {
         this.produccion = this.produccion + costo;
@@ -230,7 +237,7 @@ public class Fotocopiadora
     }
 
 
-// -------------------- metodos para definir y obtener las tintas --------------------
+// metodos para definir y obtener las tintas
     public void set_negro(double blanco_negro)
     {
         this.negro = blanco_negro;
@@ -256,7 +263,6 @@ public class Fotocopiadora
         return cian;
     }
 
-
     public void set_magenta(double magenta)
     {
         this.magenta = magenta;
@@ -267,8 +273,7 @@ public class Fotocopiadora
     }
 
 
-// -------------------- metodos para definir y obtener los consumos de tinta ----------
-
+// metodos para definir y obtener los consumos de tinta
     public void set_consumo_negro(double consumo_negro)
     {
         this.consumo_negro = consumo_negro;
@@ -297,6 +302,7 @@ public class Fotocopiadora
     }
 
 
+// metodos para definir y obtener el valor de recarga
     public void set_recarga(int recarga)
     {
         this.recarga = recarga;

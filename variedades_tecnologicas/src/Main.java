@@ -2,22 +2,22 @@ import java.util.Scanner;
 
 public class Main
 {
-    // ---------- funcion para calcular calcular el dinero del dia ----------
+// funcion para calcular calcular el dinero del dia
     public static void cierre_dia(Negocio local)
     {
         int ventas, costo = 0, foto_gana, minu_gana;
 
-    // estadisticas de operador
+        // estadisticas de operador
         ventas = local.get_opera().get_recolectado();
         minu_gana = local.get_opera().get_recolectado() - local.get_opera().get_produccion();
         costo += (local.get_opera().get_produccion());
 
-    // rendimiento de las fotocopias
+        // rendimiento de las fotocopias
         ventas += local.getFotoP().get_recolectado();
         foto_gana = local.getFotoP().get_recolectado() - local.getFotoP().get_produccion();
         costo += (local.getFotoP().get_produccion()
-                + local.getCostoEmpleadoDia()
-                + local.getConstoEnergiaDia());
+                + local.getCosto_mpleado()
+                + local.getCosto_energia());
 
         System.out.println("******************** CIERRE DEL DIA ********************");
         System.out.println("VALOR RECOLECTADO: $" + ventas);
@@ -41,18 +41,19 @@ public class Main
         }
     }
 
-// -------------------- funcion para mostrar el menu de los operadores --------------------
+
+// funcion para mostrar el menu de los operadores
     public static void menu_minutos(Negocio local,Scanner getDate)
     {
         int op, opcion, cantidad, valor_total, costo_total, efectivo;
 
-    // pregunta el tipo de movimiento a realizar
+        // pregunta el tipo de movimiento a realizar
         System.out.println("\n(1) Llamar operador "
                 + "\n(2) Comprar SIM Card");
         System.out.print("Ingrese una opcion: ");
         op = getDate.nextInt();
 
-    // ciclo para mostrar la lista de operadores
+        // ciclo para mostrar la lista de operadores
         System.out.println("\n----- lista de operadores -----");
         for (int i = 0; i < local.getLisOper().size() ; i++)
         {
@@ -95,7 +96,8 @@ public class Main
 
     }
 
-// ---------- funcion para llamar el menu de las fotocopiadoras ----------
+
+// funcion para llamar el menu de las fotocopiadoras
     public static void menu_fotocopias(Negocio local, Scanner getDate)
     {
         int tipo_foto;
@@ -117,7 +119,7 @@ public class Main
     }
 
 
-// ------------------------------ funcion para realizar una venta de fotocopias --------------------
+// funcion para realizar una venta de fotocopias
     public static void vender_fotocopia(Negocio local, Scanner getDate, int numero_foto)
     {
         // atributos generales
@@ -156,7 +158,10 @@ public class Main
         tinta = getDate.nextInt();
 
         // muestra el valor total de la impresion
-        local.set_total(numero_foto, tinta, area, impresion);
+        local.set_total(local.getFotoP().get_nombre(),
+                        tinta,
+                        area,
+                        impresion);
         valor_total = local.get_venta();
         costo_total = local.get_costo();
         System.out.println(">>>>> VALOR A PAGAR: $" + valor_total);
@@ -342,11 +347,9 @@ public class Main
         Negocio local = new Negocio(35000,12500);
         Scanner getDate = new Scanner(System.in);
 
-
-    // ---------- carga los datos de los archivos .txt ----------
+        // carga los datos de los archivos
         local.cargar_operadores();
         local.cargar_impresoras();
-
 
         // ciclo para mostrar el menu de opciones
         do

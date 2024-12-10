@@ -7,12 +7,13 @@ public class Operador
     private int costo_sim;
     private int venta_sim;
 
+
 // atributos de rendimiento
     private int recolectado;
     private int produccion;
 
 
-// ------------------------------ constructor del operador ------------------------------
+// -------------------- constructor del operador --------------------
     public Operador(String nombre, int costo, int valor_venta, int costo_sim, int venta_sim)
     {
         this.nombre = nombre;
@@ -22,7 +23,8 @@ public class Operador
         this.venta_sim = venta_sim;
     }
 
-// -------------------- metodos del operador --------------------
+
+// metodos apara definr y obtener los atributos del operador
     public void set_nombre(String nombre)
     {
         this.nombre = nombre;
@@ -69,8 +71,7 @@ public class Operador
     }
 
 
-
-// -------------------- metodos para adicionar el valor recolectado del dia --------------------
+//  metodos para adicionar el valor recolectado del dia
     public void set_recolectado(int efectivo)
     {
         this.recolectado = this.recolectado + efectivo;
@@ -80,7 +81,8 @@ public class Operador
         return recolectado;
     }
 
-// -------------------- metodos para adicionar el costo de produccion del dia --------------------
+
+// metodos para adicionar el costo de produccion del dia
     public void set_produccion(int costo)
     {
         this.produccion = this.produccion + costo;
