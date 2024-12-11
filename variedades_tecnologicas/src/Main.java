@@ -2,6 +2,7 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
+import java.util.ArrayList;
 import java.util.Objects;
 import java.util.Scanner;
 
@@ -18,10 +19,13 @@ public class Main extends JFrame
     JLabel dinero_insuficiente = new JLabel("Dinero insuficiente", SwingConstants.CENTER);
 
 
+    JTabbedPane impresoras = new JTabbedPane( );
+
     // crea los paneles a utilizar
     private JPanel menu_principal = new JPanel();
     private JPanel efectivo = new JPanel();
     private JPanel menu_operador = new JPanel();
+    private JPanel foto_menu = new JPanel();
 
 
     // ---------- constructor de la clase Main ----------
@@ -57,15 +61,15 @@ public class Main extends JFrame
     // metodo para conocer la distancia en x
     public int distancia_x(JLabel objeto)
     {
-        return (objeto.getX()+objeto.getWidth()) + 10;
+        return (objeto.getX()+objeto.getWidth()) + 20;
     }
     public int distancia_x(JButton objeto)
     {
-        return (objeto.getX()+objeto.getWidth() + 10);
+        return (objeto.getX()+objeto.getWidth() + 20);
     }
     public int distancia_x(JTextField objeto)
     {
-        return (objeto.getX()+objeto.getWidth()) + 10;
+        return (objeto.getX()+objeto.getWidth()) + 20;
     }
 
 
@@ -107,21 +111,11 @@ public class Main extends JFrame
         this.getContentPane().add(menu_principal);
         menu_principal.setBackground(Color.lightGray);
 
-        // carga el logo del negocio
-        ImageIcon imagen = new ImageIcon("logo.png");
-        JLabel logo = new JLabel();
-        logo.setBounds(((width-204) / 2),
-                ((height-202) / 8),
-                204,
-                200);
-        logo.setIcon(new ImageIcon(imagen.getImage().getScaledInstance(logo.getWidth(), logo.getHeight(), Image.SCALE_SMOOTH)));
-        menu_principal.add(logo);
-
         // nombre del negocio
         JLabel nombre = new JLabel("Variedades tecnologicas", SwingConstants.CENTER);
-        nombre.setBounds(0,
-                distancia_y(logo),
-                500,
+        nombre.setBounds((width-400)/2,
+                ((height-40) / 8),
+                400,
                 40);
         nombre.setForeground(Color.darkGray);
         nombre.setFont(new Font("Verdana", 3, 25));
@@ -170,6 +164,19 @@ public class Main extends JFrame
             }
         };
         minutos.addActionListener(opera);
+
+        // evento de fotocopias
+        ActionListener foto = new ActionListener()
+        {
+            @Override
+            public void actionPerformed(ActionEvent e)
+            {
+                menu_principal.setVisible(false);
+                menu_impresoras();
+                impresoras.setVisible(true);
+            }
+        };
+        fotocopias.addActionListener(foto);
 
         // evento de cierre
         ActionListener cerrar = new ActionListener()
@@ -663,6 +670,176 @@ public class Main extends JFrame
             System.out.println("----- NINGUNO ha generado ingresos -----");
         }
     }
+
+
+
+    public void menu_impresoras()
+    {
+        int contador=0;
+
+        // Llama al archivo de impresoras para almacenarlas
+        local.cargar_impresoras();
+
+        // Lista con elementos para generar pestañas
+        ArrayList<String> elementos = new ArrayList<>();
+        for (int i=0; i<local.get_fotolista().size(); i++)
+        {
+            local.usar_foto(i + 1);
+            String nombre = local.getFotoP().get_nombre();
+            elementos.add(nombre);
+        }
+
+        // Crear pestañas dinámicamente basadas en la lista
+        for (String elemento : elementos)
+        {
+            contador++;
+            JPanel panel = new JPanel();
+            panel.setLayout(null);
+
+            // define los valores de la impresora a usar
+            local.usar_foto(contador);
+
+            // carga los archivos de las imagenes
+            ImageIcon imagen = new ImageIcon("logo.png");
+            ImageIcon b = new ImageIcon("black.png");
+            ImageIcon y = new ImageIcon("yellow.png");
+            ImageIcon c = new ImageIcon("cyan.png");
+            ImageIcon m = new ImageIcon("magenta.png");
+            JLabel imagen1 = cargar_imagen(imagen,
+                                            ((width - 204) / 2),
+                                            ((height - 202) / 8),
+                                            204,
+                                            200);
+
+            // añade nombre de la impresora en el menu
+            JLabel nombre = new JLabel(elemento, SwingConstants.CENTER);
+            nombre.setBounds(imagen1.getX(),
+                            distancia_y(imagen1),
+                            200,
+                            30);
+            nombre.setForeground(Color.darkGray);
+            nombre.setFont(new Font("Verdana", 1, 20));
+
+            // añade los recuadros de color
+            JLabel negro = cargar_imagen(b,
+                    (width-66)/5,
+                    distancia_y(nombre),
+                    66,
+                    40);
+            JLabel amarillo = cargar_imagen(y,
+                    distancia_x(negro),
+                    negro.getY(),
+                    66,
+                    40);
+            JLabel cian = cargar_imagen(c,
+                    distancia_x(amarillo),
+                    negro.getY(),
+                    66,
+                    40);
+            JLabel magenta = cargar_imagen(m,
+                    distancia_x(cian),
+                    negro.getY(),
+                    66,
+                    40);
+
+            // añade los porcentajes de cada tinta
+            JLabel por_1 = porcentaje(
+                    negro.getX(),
+                    negro.getY(),
+                    Color.WHITE,
+                    local.getFotoP().get_negro());
+            JLabel por_2 = porcentaje(
+                    amarillo.getX(),
+                    amarillo.getY(),
+                    Color.darkGray,
+                    local.getFotoP().get_amarillo());
+            JLabel por_3 = porcentaje(
+                    cian.getX(),
+                    cian.getY(),
+                    Color.darkGray,
+                    local.getFotoP().get_cian());
+            JLabel por_4 = porcentaje(
+                    magenta.getX(),
+                    magenta.getY(),
+                    Color.darkGray,
+                    local.getFotoP().get_magenta());
+
+            // boton el cierre del dia
+            JButton usar = new JButton("Usar");
+            usar.setBounds( (width-150)/2,
+                    distancia_y(negro),
+                    150,
+                    40);
+            usar.setFont(new Font("Verdana", 1, 16));
+
+            // evento de operador
+            ActionListener uso = new ActionListener()
+            {
+                @Override
+                public void actionPerformed(ActionEvent e)
+                {
+                    impresoras.setVisible(false);
+                    panel_efectivo(local, 1, 2);
+                    efectivo.setVisible(true);
+                }
+            };
+            usar.addActionListener(uso);
+
+            // Agrega el logo y el nombre de la impresora al panel
+            panel.add(imagen1);
+            panel.add(nombre);
+
+            // Agrega los porcentajes de cada tinta
+            panel.add(por_1);
+            panel.add(por_2);
+            panel.add(por_3);
+            panel.add(por_4);
+
+            // Agrega los recuadros de cada tinta
+            panel.add(negro);
+            panel.add(amarillo);
+            panel.add(cian);
+            panel.add(magenta);
+
+            // Agregas el boton de usar
+            panel.add(usar);
+
+            impresoras.addTab(elemento, panel);
+        }
+
+        getContentPane().add(impresoras);
+    }
+
+
+// metodo para para llamar las imagenes
+    private JLabel cargar_imagen(ImageIcon imagen,
+                                 int x,
+                                 int y,
+                                 int width,
+                                 int height)
+    {
+        JLabel label = new JLabel();
+        label.setBounds(x, y, width, height);
+        label.setIcon(new ImageIcon(imagen.getImage().getScaledInstance(width, height, Image.SCALE_SMOOTH)));
+        return label;
+    }
+
+
+// metodo para llamar los porcentajes de las tintas
+    private JLabel porcentaje(int x, int y, Color color, Double cantidad)
+    {
+        JLabel label = new JLabel(cantidad.toString()+"%", SwingConstants.CENTER);
+        label.setBounds(x,
+                y,
+                60,
+                40);
+        label.setForeground(color);
+        label.setFont(new Font("Verdana",
+                1,
+                10));
+        return label;
+    }
+
 
 
 
