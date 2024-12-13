@@ -67,6 +67,11 @@ public class Main extends JFrame
     {
         return (objeto.getX()+objeto.getWidth() + 20);
     }
+    public int distancia_x(JRadioButton objeto)
+    {
+        return (objeto.getX()+objeto.getWidth() + 20);
+    }
+
     public int distancia_x(JTextField objeto)
     {
         return (objeto.getX()+objeto.getWidth()) + 20;
@@ -79,6 +84,10 @@ public class Main extends JFrame
         return (objeto.getY()+objeto.getHeight()) + 10;
     }
     public int distancia_y(JButton objeto)
+    {
+        return (objeto.getY()+objeto.getHeight()) + 10;
+    }
+    public int distancia_y(JRadioButton objeto)
     {
         return (objeto.getY()+objeto.getHeight()) + 10;
     }
@@ -195,8 +204,6 @@ public class Main extends JFrame
     // metodo para llamar el panel de operador
     private void panel_operador(Negocio local)
     {
-        int valor_total[]={0}, costo_total[]={0};
-
         // carga los datos del archivo
         local.cargar_operadores();
 
@@ -204,10 +211,27 @@ public class Main extends JFrame
         this.getContentPane().add(menu_operador);
         menu_operador.setBackground(Color.lightGray);
 
+        // botones de seleccion
+        JRadioButton llamar = radio_boton("Llamar",
+                                    ((width-130) / 2),
+                                     ((height-30) / 4),
+                                    menu_operador.getBackground());
+        menu_operador.add(llamar);
+        JRadioButton sim = radio_boton("SIM Card",
+                                        llamar.getX(),
+                                        distancia_y(llamar),
+                                        menu_operador.getBackground());
+        menu_operador.add(sim);
+
+        // añade los botones a un grupo de botones
+        ButtonGroup grupo_botones = new ButtonGroup();
+        grupo_botones.add(llamar);
+        grupo_botones.add(sim);
+
         // texto del operador
         JLabel t_ope = new JLabel("operador", SwingConstants.CENTER);
         t_ope.setBounds(((width-120) / 3),
-                ((height-30) / 3),
+                distancia_y(sim),
                 120,
                 30);
         t_ope.setForeground(Color.darkGray); // color del texto
@@ -272,9 +296,12 @@ public class Main extends JFrame
                         throw new NumberFormatException("----- numero negativo -----");
                     }
 
+                    int contador = 0;
+
                     // ciclo para definir el operador
                     for (int i=0; i<local.getLisOper().size(); i++)
                     {
+                        contador = i;
                         String seleccionado = (String) desplegable.getSelectedItem();
                         if(Objects.equals(seleccionado, local.getLisOper().get(i).get_nombre()))
                         {
@@ -285,14 +312,26 @@ public class Main extends JFrame
                     }
 
                     // define el total del dinero a pagar
-                    local.set_total(2,
-                            cantidad);
-                    valor_total[0] = local.get_venta();
-                    costo_total[0] = local.get_venta();
-                    System.out.println(">>>>> VALOR A PAGAR: $" + valor_total[0]);
+                    if(llamar.isSelected())
+                    {
+                        local.set_total(1,
+                                cantidad,
+                                contador);
+                    }
+                    else
+                    {
+                        local.set_total(2,
+                                cantidad,
+                                contador);
+                    }
+
+
+                    int valor_total = local.get_venta();
+                    int costo_total = local.get_costo();
+                    System.out.println(">>>>> VALOR A PAGAR: $" + valor_total);
 
                     // lleva a la pestaña efectivo con los valores ya asignados
-                    panel_efectivo(local, valor_total[0], costo_total[0]);
+                    panel_efectivo(local, valor_total, costo_total);
 
                     // desaparece la ventana actual
                     caja_cantidad.setText("");
@@ -306,7 +345,10 @@ public class Main extends JFrame
                 }
             }
         };
-        mensaje_error(mensaje_error, confirmar, menu_operador, false);
+        mensaje_error(mensaje_error,
+                        confirmar,
+                        menu_operador,
+                        false);
         confirmar.addActionListener(pago);
     }
 
@@ -334,7 +376,9 @@ public class Main extends JFrame
 
 
 // metodo para llamar el panel del efectivo
-    private void panel_efectivo(Negocio local, int dinero_a_pagar, int costo_produccion)
+    private void panel_efectivo(Negocio local,
+                                int dinero_a_pagar,
+                                int costo_produccion)
     {
         efectivo.setLayout(null);
         this.getContentPane().add(efectivo);
@@ -375,42 +419,43 @@ public class Main extends JFrame
             @Override
             public void actionPerformed(ActionEvent evento)
             {
-                mensaje_error(mensaje_error, pago, efectivo, false);
-                mensaje_error(dinero_insuficiente, pago, efectivo, false);
+                mensaje_error(mensaje_error,
+                                pago,
+                                efectivo,
+                                false);
+                mensaje_error(dinero_insuficiente,
+                                pago,
+                                efectivo,
+                                false);
                 try
                 {
                     int pagado = Integer.parseInt(caja_efectivo.getText());
 
                     // si la cantidad es negativa lanza un error
-                    if(pagado < 1)
+                    if(pagado != dinero_a_pagar)
                     {
-                        throw new NumberFormatException("----- numero negativo -----");
-                    }
-                    else if(pagado < dinero_a_pagar)
-                    {
-                        throw new IllegalAccessException("----- dinero insuficiente -----");
+                        throw new NumberFormatException("----- dinero insuficiente -----");
                     }
                     else
                     {
-                        System.out.println("----- dinero insuficiente -----");
+                        local.registrar(1,
+                                dinero_a_pagar,
+                                costo_produccion);
+
+                        efectivo.setVisible(false);
+                        caja_efectivo.setText("");
+                        menu_principal.setVisible(true);
+
+                        System.out.println("----- venta realizada correctamente -----");
                     }
-
-                    local.registrar(1, pagado, dinero_a_pagar, costo_produccion);
-
-                    efectivo.setVisible(false);
-                    caja_efectivo.setText("");
-                    menu_principal.setVisible(true);
-                    System.out.println("----- venta realizada correctamente -----");
                 }
                 catch (NumberFormatException error)
                 {
-                    System.out.println("----- valor invalido -----");
-                    mensaje_error(mensaje_error, pago, efectivo, true);
-                }
-                catch(IllegalAccessException pobre)
-                {
                     System.out.println("----- dinero insuficiente -----");
-                    mensaje_error(dinero_insuficiente, pago, efectivo, true);
+                    mensaje_error(dinero_insuficiente,
+                                    pago,
+                                    efectivo,
+                                    true);
                 }
             }
         };
@@ -470,7 +515,7 @@ public class Main extends JFrame
         efectivo = getDate.nextInt();
 
         // registra el pago en el negocio
-        if(local.registrar(2, efectivo, valor_total, costo_total))
+        if(local.registrar(2, efectivo, costo_total))
         {
             System.out.println("----- venta realizada con exito -----");
             local.escribir_impresora(numero_foto, area, tinta);
@@ -672,7 +717,6 @@ public class Main extends JFrame
     }
 
 
-
     public void menu_impresoras()
     {
         int contador=0;
@@ -840,7 +884,21 @@ public class Main extends JFrame
         return label;
     }
 
-
+// metodo para llamar los botones de seleccion
+    private JRadioButton radio_boton(String mensaje, int x, int y, Color color)
+    {
+        JRadioButton opcion = new JRadioButton(mensaje, true);
+        opcion.setBounds(x,
+                y,
+                130,
+                30);
+        opcion.setForeground(Color.darkGray);
+        opcion.setBackground(color);
+        opcion.setFont(new Font("Verdana",
+                0,
+                22));
+        return opcion;
+    }
 
 
     // metodo para inicializar el programa

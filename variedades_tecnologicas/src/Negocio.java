@@ -31,6 +31,10 @@ public class Negocio
         foto_lista = new ArrayList<>();
         // el objeto recibe el valor de la fotocopiadora predeterminada
 
+        //
+        this.venta = 0;
+        this.costo = 0;
+
         // costos diarios del negocio
         this.costo_mpleado = costo_mpleado;
         this.costo_energia = costo_energia;
@@ -55,7 +59,7 @@ public class Negocio
     // metodo para usar el objeto del operador
     public void usar_opera(int posicion)
     {
-        opera = lista_operador.get(posicion);
+        this.opera = lista_operador.get(posicion);
     }
 
 
@@ -151,48 +155,34 @@ public class Negocio
 
 
 // registrar la venta en el negocio
-    public boolean registrar(int servicio, int efectivo, int valor_total, int costo)
+    public boolean registrar(int servicio, int efectivo, int costo)
     {
         if (servicio == 1) // minutos
         {
-            if (valor_total == efectivo)
-            {
-                this.opera.set_recolectado(efectivo);
-                this.opera.set_produccion(costo);
-            }
-            else
-            {
-                return false;
-            }
+            this.opera.set_recolectado(efectivo);
+            this.opera.set_produccion(costo);
         }
         else // fotocopiadoras
         {
-            if (valor_total == efectivo)
-            {
-                this.fotoP.set_recolectado(efectivo);
-                this.fotoP.set_produccion(costo);
-            }
-            else
-            {
-                return false;
-            }
+            this.fotoP.set_recolectado(efectivo);
+            this.fotoP.set_produccion(costo);
         }
         return true;
     }
 
 
 // total de los minutos
-    public void set_total(int opcion, int cantidad)
+    public void set_total(int opcion, int cantidad, int posicion)
     {
-        if (opcion == 1) // venta de minutos
-        {
-            venta = cantidad * this.opera.get_venta();
-            costo = cantidad * this.opera.get_costo();
+        if (opcion == 1)
+        { // venta de minutos
+            this.venta = cantidad * getLisOper().get(posicion).get_venta();
+            this.costo = cantidad * getLisOper().get(posicion).get_costo();
         }
-        else // venta de SIM Card
-        {
-            venta = cantidad * this.opera.get_venta_sim();
-            costo = cantidad * this.opera.get_costo_sim();
+        else if (opcion == 2)
+        { // venta de SIM Card
+            this.venta = cantidad * getLisOper().get(posicion).get_venta_sim();
+            this.costo = cantidad * getLisOper().get(posicion).get_costo_sim();
         }
     }
 
@@ -238,10 +228,12 @@ public class Negocio
             }
         }
     }
-    public int get_venta() {
+    public int get_venta()
+    {
         return venta;
     }
-    public int get_costo() {
+    public int get_costo()
+    {
         return costo;
     }
 
