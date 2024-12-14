@@ -4,7 +4,6 @@ import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
 import java.util.ArrayList;
 import java.util.Objects;
-import java.util.Scanner;
 
 public class Main extends JFrame
 {
@@ -301,12 +300,12 @@ public class Main extends JFrame
                     if(llamar.isSelected())
                     {
                         // llama al panel efectivo
-                        panel_efectivo(local, 1, cantidad, seleccionado);
+                        panel_efectivo(local, 1, 1, cantidad, seleccionado);
                     }
                     else
                     {
                         // llama al panel efectivo
-                        panel_efectivo(local, 2, cantidad, seleccionado);
+                        panel_efectivo(local, 1, 2, cantidad, seleccionado);
                     }
 
                     // desaparece la ventana actual
@@ -332,13 +331,452 @@ public class Main extends JFrame
     }
 
 
-// metodo para llamar el panel del efectivo
+    // metodo para llamar el panel de operador
+    public void menu_impresoras()
+    {
+        int contador = 0;
+
+        // Llama al archivo de impresoras para almacenarlas en una lista
+        local.cargar_impresoras();
+
+        // Lista con elementos para generar pestañas
+        ArrayList<String> elementos = new ArrayList<>();
+
+        for (int i=0; i<local.get_fotolista().size(); i++)
+        {
+            String nombre = local.get_fotolista().get(i).get_nombre();
+            elementos.add(nombre);
+        }
+
+        // Crear pestañas dinámicamente basadas en la lista
+        for (String elemento : elementos)
+        {
+            contador++;
+            JPanel panel = new JPanel();
+            panel.setLayout(null);
+
+            // define los valores de la impresora a usar
+            local.usar_foto(contador);
+
+            // carga los archivos de las imagenes
+            ImageIcon imagen = new ImageIcon("logo.png");
+            ImageIcon b = new ImageIcon("black.png");
+            ImageIcon y = new ImageIcon("yellow.png");
+            ImageIcon c = new ImageIcon("cyan.png");
+            ImageIcon m = new ImageIcon("magenta.png");
+
+            JLabel imagen1 = cargar_imagen(imagen,
+                    ((width - 204) / 2),
+                    ((height - 202) / 8),
+                    204,
+                    200);
+
+            // añade nombre de la impresora en el menu
+            JLabel nombre = new JLabel(elemento, SwingConstants.CENTER);
+            nombre.setBounds(imagen1.getX(),
+                    distancia_y(imagen1),
+                    200,
+                    30);
+            nombre.setForeground(Color.darkGray);
+            nombre.setFont(new Font("Verdana", 1, 20));
+
+            // añade los recuadros de color
+            JLabel negro = cargar_imagen(b,
+                    (width-66)/5,
+                    distancia_y(nombre),
+                    66,
+                    40);
+            JLabel amarillo = cargar_imagen(y,
+                    distancia_x(negro),
+                    negro.getY(),
+                    66,
+                    40);
+            JLabel cian = cargar_imagen(c,
+                    distancia_x(amarillo),
+                    negro.getY(),
+                    66,
+                    40);
+            JLabel magenta = cargar_imagen(m,
+                    distancia_x(cian),
+                    negro.getY(),
+                    66,
+                    40);
+
+            // añade los porcentajes de cada tinta
+            JLabel por_1 = porcentaje(
+                    negro.getX(),
+                    negro.getY(),
+                    Color.WHITE,
+                    local.getFotoP().get_negro());
+            JLabel por_2 = porcentaje(
+                    amarillo.getX(),
+                    amarillo.getY(),
+                    Color.darkGray,
+                    local.getFotoP().get_amarillo());
+            JLabel por_3 = porcentaje(
+                    cian.getX(),
+                    cian.getY(),
+                    Color.darkGray,
+                    local.getFotoP().get_cian());
+            JLabel por_4 = porcentaje(
+                    magenta.getX(),
+                    magenta.getY(),
+                    Color.darkGray,
+                    local.getFotoP().get_magenta());
+
+            // botones de seleccion
+            JRadioButton tinta_negra = radio_boton("Blanco y negro",
+                    ((width-192) / 3),
+                    distancia_y(negro),
+                    panel.getBackground());
+            JRadioButton tinta_color = radio_boton("Color",
+                    distancia_x(tinta_negra),
+                    tinta_negra.getY(),
+                    panel.getBackground());
+
+            // grupo para agrupar los botones de seleccion
+            ButtonGroup grupo_tinta = new ButtonGroup();
+            grupo_tinta.add(tinta_negra);
+            grupo_tinta.add(tinta_color);
+
+            // boton para usar la impresora
+            JButton usar = new JButton("Usar");
+            usar.setBounds( (width-150)/2,
+                    distancia_y(tinta_negra),
+                    150,
+                    40);
+            usar.setFont(new Font("Verdana", 1, 16));
+
+
+            // evento de la impresion
+            ActionListener uso = new ActionListener()
+            {
+                @Override
+                public void actionPerformed(ActionEvent e)
+                {
+                    int indice = impresoras.getSelectedIndex();
+                    String nombre = impresoras.getTitleAt(indice);
+
+                    if(Objects.equals(local.get_fotolista().get(indice).get_nombre(), "Plotter"))
+                    {
+                        vender_impresion(local, nombre);
+                    }
+                    else
+                    {
+                        // define el total del dinero a pagar
+                        if(tinta_negra.isSelected())
+                        {
+                            // llama al panel efectivo
+                            vender_impresion(local, nombre, tinta_negra.getText());
+                        }
+                        else
+                        {
+                            // llama al panel efectivo
+                            vender_impresion(local, nombre, tinta_color.getText());
+                        }
+                    }
+
+                    System.out.println("Impresora seleccionada: " + nombre);
+
+                    impresoras.setVisible(false);
+                    foto_menu.setVisible(true);
+                }
+            };
+            usar.addActionListener(uso);
+
+            // agrega el logo y el nombre de la impresora al panel
+            panel.add(imagen1);
+            panel.add(nombre);
+
+            // agrega los porcentajes de cada tinta
+            panel.add(por_1);
+            panel.add(por_2);
+            panel.add(por_3);
+            panel.add(por_4);
+
+            // agrega los recuadros de cada tinta
+            panel.add(negro);
+            panel.add(amarillo);
+            panel.add(cian);
+            panel.add(magenta);
+
+            // agrega los botones de seleccion
+            panel.add(tinta_negra);
+            panel.add(tinta_color);
+
+            // agrega el boton de usar
+            panel.add(usar);
+
+            impresoras.addTab(elemento, panel);
+        }
+
+        getContentPane().add(impresoras);
+    }
+
+
+    // metodo para vender una impresion normal
+    public void vender_impresion(Negocio local, String nombre_impresora, String opcion)
+    {
+        foto_menu.setLayout(null);
+        this.getContentPane().add(foto_menu);
+        foto_menu.setBackground(Color.lightGray);
+
+        // texto del efectivo
+        JLabel t_can = new JLabel("Cantidad", SwingConstants.CENTER);
+        t_can.setBounds(((width-500) / 2),
+                ((height-40) / 3),
+                500,
+                30); // posicion y tamaño
+        t_can.setForeground(Color.darkGray); // color del texto
+        t_can.setFont(new Font("Verdana", 0, 22));
+        foto_menu.add(t_can);
+
+        // crear caja de texto
+        JTextField caja_cantidad = new JTextField();
+        caja_cantidad.setBounds( ((width-120) / 2),
+                distancia_y(t_can),
+                120,
+                40);
+        caja_cantidad.setFont(new Font("Verdana", 1, 16));
+        foto_menu.add(caja_cantidad);
+
+        // boton para confirmar la cantidad
+        JButton pago = new JButton("Ingresar");
+        pago.setBounds(( (width-120)/2),
+                distancia_y(caja_cantidad),
+                120,
+                40);
+        pago.setFont(new Font("Verdana", 1, 16));
+        foto_menu.add(pago);
+
+        // capturar evento del boton confirmar
+        ActionListener pagar = new ActionListener()
+        {
+            @Override
+            public void actionPerformed(ActionEvent e)
+            {
+                mensaje_error(mensaje_error,
+                        pago,
+                        menu_operador,
+                        false);
+                try
+                {
+                    int cantidad = Integer.parseInt(caja_cantidad.getText());
+
+                    // si la cantidad es negativa lanza un error
+                    if(cantidad < 1)
+                    {
+                        throw new NumberFormatException("----- numero negativo -----");
+                    }
+
+                    int numero = 0;
+
+                    // desaparece la ventana actual
+                    for(int i=0; i<local.get_fotolista().size(); i++)
+                    {
+                        if(nombre_impresora == local.get_fotolista().get(i).get_nombre())
+                        {
+                            numero = i;
+                        }
+                    }
+
+                    if(opcion == "Blanco y negro")
+                    {
+                        panel_efectivo(local, 2, 1, cantidad, nombre_impresora);
+                        local.escribir_impresora(numero, cantidad, 1);
+                    }
+                    else
+                    {
+                        panel_efectivo(local, 2, 2, cantidad, nombre_impresora);
+                        local.escribir_impresora(numero, cantidad, 2);
+                    }
+                    foto_menu.setVisible(false);
+                    efectivo.setVisible(true);
+                }
+                catch (NumberFormatException error)
+                {
+                    System.out.println("----- valor invalido -----");
+                    mensaje_error(mensaje_error,
+                            pago,
+                            menu_operador,
+                            true);
+                }
+                caja_cantidad.setText("");
+            }
+        };
+        mensaje_error(mensaje_error,
+                pago,
+                menu_operador,
+                false);
+        pago.addActionListener(pagar);
+    }
+
+    // metodo para vender una impresion de plotter
+    public void vender_impresion(Negocio local, String nombre_impresora)
+    {
+        foto_menu.setLayout(null);
+        this.getContentPane().add(foto_menu);
+        foto_menu.setBackground(Color.lightGray);
+
+        // botones de seleccion
+        JRadioButton afiche = radio_boton("Afiche",
+                ((width-192) / 3),
+                ((height-40) / 5),
+                foto_menu.getBackground());
+        foto_menu.add(afiche);
+        JRadioButton plano = radio_boton("Plano",
+                distancia_x(afiche),
+                afiche.getY(),
+                foto_menu.getBackground());
+        foto_menu.add(plano);
+
+        // grupo para agrupar los botones de seleccion
+        ButtonGroup grupo_tipo = new ButtonGroup();
+        grupo_tipo.add(afiche);
+        grupo_tipo.add(plano);
+
+        // texto del efectivo
+        JLabel ancho = new JLabel("Ancho", SwingConstants.CENTER);
+        ancho.setBounds(((width-120) / 2),
+                distancia_y(afiche),
+                120,
+                40); // posicion y tamaño
+        ancho.setForeground(Color.darkGray); // color del texto
+        ancho.setFont(new Font("Verdana", 0, 22));
+        foto_menu.add(ancho);
+
+        // crear caja de texto del ancho
+        JTextField caja_ancho = new JTextField();
+        caja_ancho.setBounds(((width-120) / 2),
+                distancia_y(ancho),
+                120,
+                40);
+        caja_ancho.setFont(new Font("Verdana", 1, 16));
+        foto_menu.add(caja_ancho);
+
+        // crear caja de texto del ancho
+        JLabel largo = new JLabel("Largo", SwingConstants.CENTER);
+        largo.setBounds(ancho.getX(),
+                distancia_y(caja_ancho),
+                120,
+                30); // posicion y tamaño
+        largo.setForeground(Color.darkGray); // color del texto
+        largo.setFont(new Font("Verdana", 0, 22));
+        foto_menu.add(largo);
+
+        // crear caja de texto
+        JTextField caja_largo = new JTextField();
+        caja_largo.setBounds( ancho.getX(),
+                distancia_y(largo),
+                120,
+                40);
+        caja_largo.setFont(new Font("Verdana", 1, 16));
+        foto_menu.add(caja_largo);
+
+
+        // boton para confirmar la cantidad
+        JButton pago = new JButton("Ingresar");
+        pago.setBounds(ancho.getX(),
+                distancia_y(caja_largo),
+                120,
+                40);
+        pago.setFont(new Font("Verdana", 1, 16));
+        foto_menu.add(pago);
+
+        // capturar evento del boton confirmar
+        ActionListener accion = new ActionListener()
+        {
+            @Override
+            public void actionPerformed(ActionEvent e)
+            {
+                mensaje_error(mensaje_error,
+                        pago,
+                        foto_menu,
+                        false);
+                try
+                {
+                    int an = Integer.parseInt(caja_ancho.getText());
+                    int lar = Integer.parseInt(caja_largo.getText());
+
+                    // si la cantidad es negativa lanza un error
+                    if(an < 1 || lar < 1)
+                    {
+                        throw new NumberFormatException("----- numero negativo -----");
+                    }
+
+                    int numero = 0;
+
+                    // desaparece la ventana actual
+                    for(int i=0; i<local.get_fotolista().size(); i++)
+                    {
+                        if(nombre_impresora == local.get_fotolista().get(i).get_nombre())
+                        {
+                            numero = i;
+                        }
+                    }
+
+
+                    // define el total del dinero a pagar
+                    if(afiche.isSelected())
+                    {
+                        // llama al panel efectivo
+                        panel_efectivo(local,
+                                2,
+                                1,
+                                an*lar,
+                                nombre_impresora);
+                        local.escribir_impresora(numero, an*lar, 1);
+                    }
+                    else
+                    {
+                        // llama al panel efectivo
+                        panel_efectivo(local,
+                                2,
+                                2,
+                                an*lar,
+                                nombre_impresora);
+                        local.escribir_impresora(numero, an*lar, 2);
+                    }
+
+                    // desaparece la ventana actual
+                    foto_menu.setVisible(false);
+                    efectivo.setVisible(true);
+                }
+                catch (NumberFormatException error)
+                {
+                    System.out.println("----- valor invalido -----");
+                    mensaje_error(mensaje_error,
+                            pago,
+                            foto_menu,
+                            true);
+                }
+                caja_ancho.setText("");
+                caja_largo.setText("");
+            }
+        };
+        mensaje_error(mensaje_error,
+                pago,
+                menu_operador,
+                false);
+        pago.addActionListener(accion);
+    }
+
+
+    // metodo para llamar el panel del efectivo
     private void panel_efectivo(Negocio local,
+                                int servicio,
                                 int opcion,
                                 int cantidad,
                                 String nombre)
     {
-        local.set_total(opcion, cantidad, nombre);
+        if(servicio == 1)
+        {
+            local.set_total(opcion, cantidad, nombre);
+        }
+        else
+        {
+            local.set_total(nombre, cantidad, opcion);
+        }
         System.out.println("VALOR A PAGAR: $" + local.get_venta());
         System.out.println("- Costo de produccion: $" + local.get_costo());
 
@@ -399,7 +837,7 @@ public class Main extends JFrame
                     }
                     else
                     {
-                        local.registrar(1,
+                        local.registrar(servicio,
                                 local.get_venta(),
                                 local.get_costo());
 
@@ -424,71 +862,7 @@ public class Main extends JFrame
     }
 
 
-    // funcion para realizar una venta de fotocopias
-    public static void vender_fotocopia(Negocio local, Scanner getDate, int numero_foto)
-    {
-        // atributos generales
-        int tinta, efectivo, valor_total, costo_total;
-        // atributos del plotter
-        int ancho, largo, area, impresion = 0;
-
-        // imprimir en el plotter
-        if(numero_foto == 3)
-        {
-            // pregunta el tipo de impresion
-            System.out.println("\n(1) Afiche publicitario "
-                    + "\n(2) Plano arquitectonico");
-            System.out.print("Ingrese el tipo de impresion a realizar: ");
-            impresion = getDate.nextInt();
-
-            // pregunta las medidas de la impresion
-            System.out.print("\nIngrese el ancho en CM: ");
-            ancho = getDate.nextInt();
-            System.out.print("- Ingrese el largo en CM: ");
-            largo = getDate.nextInt();
-            area = ancho * largo;
-        }
-        // imprimir en las otras fotocopiadoras
-        else
-        {
-            // pregunta la cantidad de copias a imprimir
-            System.out.print("- Cantidad de copias: ");
-            area = getDate.nextInt();
-        }
-
-        // pregunta el color de la tinta a utilizar
-        System.out.println("\n(1) Color " +
-                            "\n(2) Blanco y negro");
-        System.out.print("Ingrese el color de la tinta: ");
-        tinta = getDate.nextInt();
-
-        // muestra el valor total de la impresion
-        local.set_total(local.getFotoP().get_nombre(),
-                        tinta,
-                        area,
-                        impresion);
-        valor_total = local.get_venta();
-        costo_total = local.get_costo();
-        System.out.println(">>>>> VALOR A PAGAR: $" + valor_total);
-
-        // pide el efectivo al cliente
-        System.out.print("Ingrese su efectivo: $");
-        efectivo = getDate.nextInt();
-
-        // registra el pago en el negocio
-        if(local.registrar(2, efectivo, costo_total))
-        {
-            System.out.println("----- venta realizada con exito -----");
-            local.escribir_impresora(numero_foto, area, tinta);
-        }
-        else
-        {
-            System.out.println("----- dinero insuficiente -----");
-        }
-    }
-
-
-    // funcion para calcular calcular el dinero del dia
+    // metodo para calcular el dinero del dia
     public static void cierre_dia(Negocio local)
     {
         int ventas, costo = 0, foto_gana, minu_gana;
@@ -528,169 +902,7 @@ public class Main extends JFrame
     }
 
 
-    public void menu_impresoras()
-    {
-        int contador = 0;
-
-        // Llama al archivo de impresoras para almacenarlas en una lista
-        local.cargar_impresoras();
-
-        // Lista con elementos para generar pestañas
-        ArrayList<String> elementos = new ArrayList<>();
-
-        for (int i=0; i<local.get_fotolista().size(); i++)
-        {
-            local.usar_foto(i + 1);
-            String nombre = local.getFotoP().get_nombre();
-            elementos.add(nombre);
-        }
-
-        // Crear pestañas dinámicamente basadas en la lista
-        for (String elemento : elementos)
-        {
-            contador++;
-            JPanel panel = new JPanel();
-            panel.setLayout(null);
-
-            // define los valores de la impresora a usar
-            local.usar_foto(contador);
-
-            // carga los archivos de las imagenes
-            ImageIcon imagen = new ImageIcon("logo.png");
-            ImageIcon b = new ImageIcon("black.png");
-            ImageIcon y = new ImageIcon("yellow.png");
-            ImageIcon c = new ImageIcon("cyan.png");
-            ImageIcon m = new ImageIcon("magenta.png");
-
-            JLabel imagen1 = cargar_imagen(imagen,
-                                            ((width - 204) / 2),
-                                            ((height - 202) / 8),
-                                            204,
-                                            200);
-
-            // añade nombre de la impresora en el menu
-            JLabel nombre = new JLabel(elemento, SwingConstants.CENTER);
-            nombre.setBounds(imagen1.getX(),
-                            distancia_y(imagen1),
-                            200,
-                            30);
-            nombre.setForeground(Color.darkGray);
-            nombre.setFont(new Font("Verdana", 1, 20));
-
-            // añade los recuadros de color
-            JLabel negro = cargar_imagen(b,
-                    (width-66)/5,
-                    distancia_y(nombre),
-                    66,
-                    40);
-            JLabel amarillo = cargar_imagen(y,
-                    distancia_x(negro),
-                    negro.getY(),
-                    66,
-                    40);
-            JLabel cian = cargar_imagen(c,
-                    distancia_x(amarillo),
-                    negro.getY(),
-                    66,
-                    40);
-            JLabel magenta = cargar_imagen(m,
-                    distancia_x(cian),
-                    negro.getY(),
-                    66,
-                    40);
-
-            // añade los porcentajes de cada tinta
-            JLabel por_1 = porcentaje(
-                    negro.getX(),
-                    negro.getY(),
-                    Color.WHITE,
-                    local.getFotoP().get_negro());
-            JLabel por_2 = porcentaje(
-                    amarillo.getX(),
-                    amarillo.getY(),
-                    Color.darkGray,
-                    local.getFotoP().get_amarillo());
-            JLabel por_3 = porcentaje(
-                    cian.getX(),
-                    cian.getY(),
-                    Color.darkGray,
-                    local.getFotoP().get_cian());
-            JLabel por_4 = porcentaje(
-                    magenta.getX(),
-                    magenta.getY(),
-                    Color.darkGray,
-                    local.getFotoP().get_magenta());
-
-            // botones de seleccion
-            JRadioButton tinta_negra = radio_boton("Blanco y negro",
-                    ((width-192) / 3),
-                    distancia_y(negro),
-                    panel.getBackground());
-            JRadioButton tinta_color = radio_boton("Color",
-                    distancia_x(tinta_negra),
-                    tinta_negra.getY(),
-                    panel.getBackground());
-
-            // boton para usar la impresora
-            JButton usar = new JButton("Usar");
-            usar.setBounds( (width-150)/2,
-                    distancia_y(tinta_negra),
-                    150,
-                    40);
-            usar.setFont(new Font("Verdana", 1, 16));
-
-            // evento de operador
-            ActionListener uso = new ActionListener()
-            {
-                @Override
-                public void actionPerformed(ActionEvent e)
-                {
-                    impresoras.setVisible(false);
-                    panel_efectivo(local,
-                            0,
-                            0,
-                            "Plotter");
-                    efectivo.setVisible(true);
-                }
-            };
-            usar.addActionListener(uso);
-
-            // agrega el logo y el nombre de la impresora al panel
-            panel.add(imagen1);
-            panel.add(nombre);
-
-            // agrega los porcentajes de cada tinta
-            panel.add(por_1);
-            panel.add(por_2);
-            panel.add(por_3);
-            panel.add(por_4);
-
-            // agrega los recuadros de cada tinta
-            panel.add(negro);
-            panel.add(amarillo);
-            panel.add(cian);
-            panel.add(magenta);
-
-            // agrega los botones de seleccion
-            panel.add(tinta_negra);
-            panel.add(tinta_color);
-
-            // agrega el boton de usar
-            panel.add(usar);
-
-            // añade los botones a un grupo de botones
-            ButtonGroup grupo_tinta = new ButtonGroup();
-            grupo_tinta.add(tinta_negra);
-            grupo_tinta.add(tinta_color);
-
-            impresoras.addTab(elemento, panel);
-        }
-
-        getContentPane().add(impresoras);
-    }
-
-
-// metodo para para llamar las imagenes
+    // metodo para para llamar las imagenes
     private JLabel cargar_imagen(ImageIcon imagen,
                                  int x,
                                  int y,

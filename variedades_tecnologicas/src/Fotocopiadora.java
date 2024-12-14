@@ -3,10 +3,10 @@ public class Fotocopiadora
 
 // atributos predeterminadods
     private String nombre;
-    private int costoHBN;
-    private int costoHC;
-    private int valorVentaHC;
-    private int valorVentaHBN;
+    private int costo_bn;
+    private int costo_c;
+    private int valor_venta_bn;
+    private int valor_venta_c;
 
 // atributos de tinta
     private double negro;
@@ -17,16 +17,6 @@ public class Fotocopiadora
     private double consumo_ci_am;
     private double consumo_magenta;
     private int recarga;
-
-// atributos de la fotocopiadora Plotter
-    private int costo_cm_plano;
-    private int costo_cm_afiche;
-    private int costo_afiche;
-    private int costo_plano;
-    private int venta_cm_plano;
-    private int venta_cm_afiche;
-    private int venta_afiche;
-    private int venta_plano;
 
 // atributos de rendimiento
     private int recolectado;
@@ -48,52 +38,13 @@ public class Fotocopiadora
                          double consumo_magenta)
     {
         this.nombre = nombre;
-        this.costoHBN = costoHBN;
-        this.costoHC = costoHC;
-        this.valorVentaHC = valorVentaHC;
-        this.valorVentaHBN = valorVentaHBN;
+        this.costo_bn = costoHBN;
+        this.costo_c = costoHC;
+        this.valor_venta_bn = valorVentaHC;
+        this.valor_venta_c = valorVentaHBN;
         this.recolectado = 0;
 
         this.negro = negro;
-        this.amarillo = amarillo;
-        this.cian = cian;
-        this.magenta = magenta;
-
-        this.consumo_negro = consumo_negro;
-        this.consumo_ci_am = consumo_ci_am;
-        this.consumo_magenta = consumo_magenta;
-    }
-
-
-// ---------- constructor para el plotter ----------
-    public Fotocopiadora(String nombre,
-                         int costo_cm_plano,
-                         int costo_cm_afiche,
-                         int venta_cm_plano,
-                         int venta_cm_afiche,
-                         int costo_plano,
-                         int costo_afiche,
-                         int venta_plano,
-                         int venta_afiche,
-                         double blanco_negro,
-                         double amarillo,
-                         double cian,
-                         double magenta,
-                         double consumo_negro,
-                         double consumo_ci_am,
-                         double consumo_magenta)
-    {
-        this.nombre = nombre;
-        this.costo_cm_plano = costo_cm_plano;
-        this.costo_cm_afiche = costo_cm_afiche;
-        this.venta_cm_plano = venta_cm_plano;
-        this.venta_cm_afiche = venta_cm_afiche;
-        this.costo_plano = costo_plano;
-        this.costo_afiche = costo_afiche;
-        this.venta_plano = venta_plano;
-        this.venta_afiche = venta_afiche;
-
-        this.negro = blanco_negro;
         this.amarillo = amarillo;
         this.cian = cian;
         this.magenta = magenta;
@@ -114,104 +65,40 @@ public class Fotocopiadora
         return nombre;
     }
 
-    public void setCostoHBN(int costoHBN)
+    public void set_costo_bn(int costo_bn)
     {
-        this.costoHBN = costoHBN;
+        this.costo_bn = costo_bn;
     }
-    public int getCostoHBN()
+    public int get_costo_bn()
     {
-        return costoHBN;
+        return costo_bn;
     }
 
-    public void setCostoHC(int costoHC)
+    public void set_costo_c(int costo_c)
     {
-        this.costoHC = costoHC;
+        this.costo_c = costo_c;
     }
-    public int getCostoHC()
+    public int get_costo_c()
     {
-        return costoHC;
+        return costo_c;
     }
 
-    public void setValorVentaHC(int valorVentaHC)
+    public void set_valor_venta_bn(int valor_venta_bn)
     {
-        this.valorVentaHC = valorVentaHC;
+        this.valor_venta_bn = valor_venta_bn;
     }
-    public int getValorVentaHC()
+    public int get_valor_venta_bn()
     {
-        return valorVentaHC;
+        return valor_venta_bn;
     }
 
-    public void setValorVentaHBN(int valorVentaHBN)
+    public void set_valor_venta_c(int valor_venta_c)
     {
-        this.valorVentaHBN = valorVentaHBN;
+        this.valor_venta_c = valor_venta_c;
     }
-    public int getValorVentaHBN()
+    public int get_valor_venta_c()
     {
-        return valorVentaHBN;
-    }
-
-
-// metodos para definir y obtener los costos por centimetro
-    public void set_costo_cm_plano(int costo_cm_plano) {
-        this.costo_cm_plano = costo_cm_plano;
-    }
-    public int get_costo_cm_plano() {
-        return costo_cm_plano;
-    }
-
-    public void set_costo_cm_afiche(int costo_cm_afiche) {
-        this.costo_cm_afiche = costo_cm_afiche;
-    }
-    public int get_costo_cm_afiche() {
-        return costo_cm_afiche;
-    }
-
-
-// metodos para definir y obtener los valores de venta por centimetro
-    public void set_venta_cm_plano(int venta_cm_plano) {
-        this.venta_cm_plano = venta_cm_plano;
-    }
-    public int get_venta_cm_plano() {
-        return venta_cm_plano;
-    }
-
-    public void set_venta_cm_afiche(int costo_cm_afiche) {
-        this.venta_cm_afiche = costo_cm_afiche;
-    }
-    public int get_venta_cm_afiche() {
-        return venta_cm_afiche;
-    }
-
-
-// metodos para definir y obtener los costos por tipo de impresion
-    public void set_costo_afiche(int costo_afiche) {
-        this.costo_afiche = costo_afiche;
-    }
-    public int get_costo_afiche() {
-        return costo_afiche;
-    }
-
-    public void set_costo_plano(int costo_plano) {
-        this.costo_plano = costo_plano;
-    }
-    public int get_costo_plano() {
-        return costo_plano;
-    }
-
-
-// metodos para definir y obtener los valores de venta por tipo de impresion
-    public void set_venta_afiche(int venta_afiche) {
-        this.venta_afiche = venta_afiche;
-    }
-    public int get_venta_afiche() {
-        return venta_afiche;
-    }
-
-    public void set_venta_plano(int venta_plano) {
-        this.venta_plano = venta_plano;
-    }
-    public int get_venta_plano() {
-        return venta_plano;
+        return valor_venta_c;
     }
 
 

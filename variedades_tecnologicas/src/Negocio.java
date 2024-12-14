@@ -123,6 +123,32 @@ public class Negocio
             costo = cantidad * getLisOper().get(posicion).get_costo_sim();
         }
     }
+// total de las fotocopias
+    public void set_total(String nombre, int area_can, int impresion)
+    {
+        int posicion = 0;
+
+        for(int i=0; i<get_fotolista().size(); i++)
+        {
+            if(Objects.equals(get_fotolista().get(i).get_nombre(), nombre))
+            {
+                posicion = i;
+                break;
+            }
+        }
+
+        // formula = cantidad * venta de hoja
+        if (impresion == 1) // color
+        {
+            venta = area_can * get_fotolista().get(posicion).get_valor_venta_c();
+            costo = area_can * get_fotolista().get(posicion).get_costo_c();
+        }
+        else // blanco y negro
+        {
+            venta = area_can * get_fotolista().get(posicion).get_valor_venta_bn();
+            costo = area_can * get_fotolista().get(posicion).get_costo_bn();
+        }
+    }
     public int get_venta()
     {
         return venta;
@@ -131,49 +157,6 @@ public class Negocio
     public int get_costo()
     {
         return costo;
-    }
-
-
-// total de las fotocopias
-    public void set_total(String nombre, int tinta, int area_can, int impresion) {
-        if (Objects.equals(nombre, "Plotter"))
-        {
-            // formula = (area * venta por centimetro) + (area * venta por impresion)
-            if (impresion == 1) // afiche
-            {
-                venta = (area_can * this.fotoP.get_venta_cm_afiche()) + (area_can * this.fotoP.get_venta_afiche());
-                costo = (area_can * this.fotoP.get_costo_cm_afiche()) + (area_can * this.fotoP.get_costo_afiche());
-            }
-            else if (impresion == 2) // plano
-            {
-                venta = (area_can * this.fotoP.get_venta_cm_plano()) + (area_can * this.fotoP.get_venta_plano());
-                costo = (area_can * this.fotoP.get_costo_cm_plano()) + (area_can * this.fotoP.get_costo_plano());
-            }
-            else
-            {
-                venta = 0;
-                costo = 0;
-            }
-        }
-        else
-        {
-            // formula = cantidad * venta de hoja
-            if (tinta == 1) // color
-            {
-                venta = area_can * this.fotoP.getValorVentaHC();
-                costo = area_can * this.fotoP.getCostoHC();
-            }
-            else if (tinta == 2) // blanco y negro
-            {
-                venta = area_can * this.fotoP.getValorVentaHBN();
-                costo = area_can * this.fotoP.getCostoHBN();
-            }
-            else
-            {
-                venta = 0;
-                costo = 0;
-            }
-        }
     }
 
 
@@ -288,13 +271,13 @@ public class Negocio
             {
                 linea = (foto_lista.get(posicion).get_nombre()
                         + ","
-                        + foto_lista.get(posicion).getCostoHBN()
+                        + foto_lista.get(posicion).get_costo_bn()
                         + ","
-                        + foto_lista.get(posicion).getValorVentaHBN()
+                        + foto_lista.get(posicion).get_valor_venta_c()
                         + ","
-                        + foto_lista.get(posicion).getValorVentaHC()
+                        + foto_lista.get(posicion).get_valor_venta_bn()
                         + ","
-                        + foto_lista.get(posicion).getCostoHC()
+                        + foto_lista.get(posicion).get_costo_c()
                         + ",");
 
                 // disminuye el porcentaje de la tinta a utilizar
