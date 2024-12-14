@@ -31,10 +31,6 @@ public class Negocio
         foto_lista = new ArrayList<>();
         // el objeto recibe el valor de la fotocopiadora predeterminada
 
-        //
-        this.venta = 0;
-        this.costo = 0;
-
         // costos diarios del negocio
         this.costo_mpleado = costo_mpleado;
         this.costo_energia = costo_energia;
@@ -85,75 +81,6 @@ public class Negocio
     }
 
 
-// ------------------------ CRUD DE OPERADOR ------------------------
-
-    // funcion para CREAR un operador
-    public void crear_operador(String nombre, int costo_minuto, int valor_venta, int costo_sim, int venta_sim)
-    {
-        lista_operador.add(new Operador(nombre,
-                                        costo_minuto,
-                                        valor_venta,
-                                        costo_sim,
-                                        venta_sim));
-    }
-
-    // funcion para MODIFICAR un operador
-    public void modificar_operador(int posicion, String nombre, int costo_minuto, int valor_venta, int costo_sim, int venta_sim) {
-        Operador operador_modificado = lista_operador.get(posicion - 1);
-        operador_modificado.set_nombre(nombre);
-        operador_modificado.set_costo(costo_minuto);
-        operador_modificado.set_venta(valor_venta);
-        operador_modificado.set_costo_sim(costo_sim);
-        operador_modificado.set_venta_sim(venta_sim);
-    }
-
-    // funcion para ELIMINAR un operador
-    public void eliminar_operador(int posicion) {
-        foto_lista.remove(posicion - 1);
-    }
-
-// ------------------------ CRUD DE FOTOCOPIADORA ------------------------
-
-    // funcion para CREAR una fotocopiadora
-    public void crear_fotocopiadora(String tipo,
-                                    int costoHBN,
-                                    int costoHC,
-                                    int valorVentaHC,
-                                    int valorVentaHBN)
-    {
-        foto_lista.add(new Fotocopiadora(tipo, costoHBN, costoHC, valorVentaHC, valorVentaHBN, 100, 100, 100, 100, 0,0,0));
-    }
-
-    // funcion para MODIFICAR una fotocopiadora
-    public void modificar_fotocopiadora(int posicion,
-                                        String nombre,
-                                        int costoHBN,
-                                        int costoHC,
-                                        int valorVentaHC,
-                                        int valorVentaHBN,
-                                        int negro,
-                                        int amarillo,
-                                        int cian,
-                                        int magenta)
-    {
-        Fotocopiadora modificada = foto_lista.get(posicion - 1);
-        modificada.set_nombre(nombre);
-        modificada.setCostoHBN(costoHBN);
-        modificada.setCostoHC(costoHC);
-        modificada.setValorVentaHC(valorVentaHC);
-        modificada.setValorVentaHBN(valorVentaHBN);
-        modificada.set_negro(negro);
-        modificada.set_amarillo(amarillo);
-        modificada.set_cian(cian);
-        modificada.set_magenta(magenta);
-    }
-
-    // funcion para ELIMINAR una fotocopiadora
-    public void eliminar_fotocopiadora(int posicion) {
-        foto_lista.remove(posicion - 1);
-    }
-
-
 // registrar la venta en el negocio
     public boolean registrar(int servicio, int efectivo, int costo)
     {
@@ -171,19 +98,39 @@ public class Negocio
     }
 
 
-// total de los minutos
-    public void set_total(int opcion, int cantidad, int posicion)
+    // valor del costo total
+    public void set_total(int opcion, int cantidad, String nombre)
     {
-        if (opcion == 1)
-        { // venta de minutos
-            this.venta = cantidad * getLisOper().get(posicion).get_venta();
-            this.costo = cantidad * getLisOper().get(posicion).get_costo();
+        int posicion = 0;
+
+        for(int i=0; i<getLisOper().size(); i++)
+        {
+            if(Objects.equals(getLisOper().get(i).get_nombre(), nombre))
+            {
+                posicion = i;
+                break;
+            }
         }
-        else if (opcion == 2)
-        { // venta de SIM Card
-            this.venta = cantidad * getLisOper().get(posicion).get_venta_sim();
-            this.costo = cantidad * getLisOper().get(posicion).get_costo_sim();
+
+        if(opcion == 1) // llamar
+        {
+            venta = cantidad * getLisOper().get(posicion).get_venta_minuto();
+            costo = cantidad * getLisOper().get(posicion).get_costo_minuto();
         }
+        else // sim card
+        {
+            venta = cantidad * getLisOper().get(posicion).get_venta_sim();
+            costo = cantidad * getLisOper().get(posicion).get_costo_sim();
+        }
+    }
+    public int get_venta()
+    {
+        return venta;
+    }
+
+    public int get_costo()
+    {
+        return costo;
     }
 
 
@@ -228,17 +175,9 @@ public class Negocio
             }
         }
     }
-    public int get_venta()
-    {
-        return venta;
-    }
-    public int get_costo()
-    {
-        return costo;
-    }
 
 
-// metodos para definir y obtener la deuda diaria del negocio
+    // metodos para definir y obtener la deuda diaria del negocio
     public void setCosto_energia(int costo_energia) {
         this.costo_energia = costo_energia;
     }
@@ -403,7 +342,6 @@ public class Negocio
                         + ","
                         + foto_lista.get(posicion).get_consumo_magenta());
                 lineas.add(linea);
-                System.out.println("\n MAMASITA RICA" + linea);
             }
 
             // escribe las líneas de vuelta al archivo

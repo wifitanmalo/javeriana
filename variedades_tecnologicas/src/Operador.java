@@ -34,20 +34,20 @@ public class Operador
         return nombre;
     }
 
-    public void set_costo(int costo)
+    public void set_costo_minuto(int costo)
     {
         this.costo = costo;
     }
-    public int get_costo()
+    public int get_costo_minuto()
     {
         return costo;
     }
 
-    public void set_venta(int valor)
+    public void set_venta_minuto(int valor)
     {
         this.valor_venta = valor;
     }
-    public int get_venta()
+    public int get_venta_minuto()
     {
         return valor_venta;
     }

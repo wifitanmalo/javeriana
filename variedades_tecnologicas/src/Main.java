@@ -115,7 +115,6 @@ public class Main extends JFrame
     // metodo para llamar el panel inicial
     private void panel_inicio(Negocio local)
     {
-
         menu_principal.setLayout(null);
         this.getContentPane().add(menu_principal);
         menu_principal.setBackground(Color.lightGray);
@@ -145,10 +144,6 @@ public class Main extends JFrame
                 distancia_y(minutos),
                 150,
                 40);
-        // habilita / desabilita el boton
-        // Fotocopias.setEnabled(false);
-        // define un atajo del teclado (alt + tecla)
-        // Fotocopias.setMnemonic('a');
         fotocopias.setFont(new Font("Verdana", 1, 16));
         menu_principal.add(fotocopias);
 
@@ -279,13 +274,17 @@ public class Main extends JFrame
         confirmar.setFont(new Font("Verdana", 1, 14));
         menu_operador.add(confirmar);
 
+
         // capturar evento del boton confirmar
         ActionListener pago = new ActionListener()
         {
             @Override
             public void actionPerformed(ActionEvent e)
             {
-                mensaje_error(mensaje_error, confirmar, menu_operador, false);
+                mensaje_error(mensaje_error,
+                            confirmar,
+                            menu_operador,
+                            false);
                 try
                 {
                     int cantidad = Integer.parseInt(caja_cantidad.getText());
@@ -296,42 +295,19 @@ public class Main extends JFrame
                         throw new NumberFormatException("----- numero negativo -----");
                     }
 
-                    int contador = 0;
-
-                    // ciclo para definir el operador
-                    for (int i=0; i<local.getLisOper().size(); i++)
-                    {
-                        contador = i;
-                        String seleccionado = (String) desplegable.getSelectedItem();
-                        if(Objects.equals(seleccionado, local.getLisOper().get(i).get_nombre()))
-                        {
-                            local.usar_opera(i);
-                            System.out.println(seleccionado + local.get_opera().get_venta_sim());
-                            break;
-                        }
-                    }
+                    String seleccionado = (String) desplegable.getSelectedItem();
 
                     // define el total del dinero a pagar
                     if(llamar.isSelected())
                     {
-                        local.set_total(1,
-                                cantidad,
-                                contador);
+                        // llama al panel efectivo
+                        panel_efectivo(local, 1, cantidad, seleccionado);
                     }
                     else
                     {
-                        local.set_total(2,
-                                cantidad,
-                                contador);
+                        // llama al panel efectivo
+                        panel_efectivo(local, 2, cantidad, seleccionado);
                     }
-
-
-                    int valor_total = local.get_venta();
-                    int costo_total = local.get_costo();
-                    System.out.println(">>>>> VALOR A PAGAR: $" + valor_total);
-
-                    // lleva a la pestaña efectivo con los valores ya asignados
-                    panel_efectivo(local, valor_total, costo_total);
 
                     // desaparece la ventana actual
                     caja_cantidad.setText("");
@@ -341,7 +317,10 @@ public class Main extends JFrame
                 catch (NumberFormatException error)
                 {
                     System.out.println("----- valor invalido -----");
-                    mensaje_error(mensaje_error, confirmar, menu_operador, true);
+                    mensaje_error(mensaje_error,
+                            confirmar,
+                            menu_operador,
+                            true);
                 }
             }
         };
@@ -353,33 +332,16 @@ public class Main extends JFrame
     }
 
 
-// funcion para llamar el menu de las fotocopiadoras
-    public static void menu_fotocopias(Negocio local, Scanner getDate)
-    {
-        int tipo_foto;
-
-        // ciclo para listar cada una de las fotocopiadoras registradas
-        System.out.println("\n----- lista de fotocopiadoras -----");
-        for (int i = 0; i < local.get_fotolista().size() ; i++)
-        {
-            System.out.println((i+1) + ") " + local.get_fotolista().get(i).get_nombre());
-        }
-
-        // pregunta la fotocopiadora a usar
-        System.out.print("Ingresa la fotocopiadora a utilizar: ");
-        tipo_foto = getDate.nextInt();
-        getDate.nextLine();
-
-        local.usar_foto(tipo_foto);
-        vender_fotocopia(local, getDate, tipo_foto);
-    }
-
-
 // metodo para llamar el panel del efectivo
     private void panel_efectivo(Negocio local,
-                                int dinero_a_pagar,
-                                int costo_produccion)
+                                int opcion,
+                                int cantidad,
+                                String nombre)
     {
+        local.set_total(opcion, cantidad, nombre);
+        System.out.println("VALOR A PAGAR: $" + local.get_venta());
+        System.out.println("- Costo de produccion: $" + local.get_costo());
+
         efectivo.setLayout(null);
         this.getContentPane().add(efectivo);
         efectivo.setBackground(Color.lightGray);
@@ -412,7 +374,6 @@ public class Main extends JFrame
         pago.setFont(new Font("Verdana", 1, 16));
         efectivo.add(pago);
 
-
         // capturar evento del boton de pago
         ActionListener pagar = new ActionListener()
         {
@@ -432,18 +393,17 @@ public class Main extends JFrame
                     int pagado = Integer.parseInt(caja_efectivo.getText());
 
                     // si la cantidad es negativa lanza un error
-                    if(pagado != dinero_a_pagar)
+                    if(pagado != local.get_venta())
                     {
                         throw new NumberFormatException("----- dinero insuficiente -----");
                     }
                     else
                     {
                         local.registrar(1,
-                                dinero_a_pagar,
-                                costo_produccion);
+                                local.get_venta(),
+                                local.get_costo());
 
                         efectivo.setVisible(false);
-                        caja_efectivo.setText("");
                         menu_principal.setVisible(true);
 
                         System.out.println("----- venta realizada correctamente -----");
@@ -451,12 +411,13 @@ public class Main extends JFrame
                 }
                 catch (NumberFormatException error)
                 {
-                    System.out.println("----- dinero insuficiente -----");
+                    System.out.println("----- dinero no coincidente -----");
                     mensaje_error(dinero_insuficiente,
                                     pago,
                                     efectivo,
                                     true);
                 }
+                caja_efectivo.setText("");
             }
         };
         pago.addActionListener(pagar);
@@ -527,156 +488,6 @@ public class Main extends JFrame
     }
 
 
-    // funcion para mostrar el menu crud de los operadores
-    public static void crud_operadores(Negocio local, Scanner getDate)
-    {
-        String nombre_operador;
-        int opcion, opcion_auxiliar, costo_minuto, valor_venta, costo_sim, venta_sim;
-
-        System.out.println("\n1) Crear operador");
-        System.out.println("2) Modificar operador");
-        System.out.println("3) Eliminar operador");
-        System.out.print("Ingresa tu opcion: ");
-        opcion = getDate.nextInt();
-        getDate.nextLine();
-
-
-        switch(opcion)
-        {
-            case 1: // crear nuevo operador
-            {
-                System.out.print("- Nombre: ");
-                nombre_operador = getDate.nextLine();
-                System.out.print("- Costo/minuto: ");
-                costo_minuto = getDate.nextInt();
-                System.out.print("- Venta/minuto: ");
-                valor_venta = getDate.nextInt();
-                System.out.print("- Costo/SIM: ");
-                costo_sim = getDate.nextInt();
-                System.out.print("- Venta/SIM: ");
-                venta_sim = getDate.nextInt();
-                local.crear_operador(nombre_operador, costo_minuto, valor_venta, costo_sim, venta_sim);
-            }; break;
-
-            case 2: // modificar nuevo operador
-            {
-                System.out.println("----- lista de operadores -----");
-                for (int i = 0; i < local.getLisOper().size() ; i++)
-                {
-                    System.out.println((i+1)+") "+local.getLisOper().get(i).get_nombre());
-                }
-
-                System.out.print("Ingresa el numero de operador a modificar: ");
-                opcion_auxiliar = getDate.nextInt();
-                getDate.nextLine();
-
-                System.out.print("- Nombre: ");
-                nombre_operador = getDate.nextLine();
-                System.out.print("- Costo/minuto: ");
-                costo_minuto = getDate.nextInt();
-                System.out.print("- Venta/minuto: ");
-                valor_venta = getDate.nextInt();
-                System.out.print("- Costo/SIM: ");
-                costo_sim = getDate.nextInt();
-                System.out.print("- Venta/SIM: ");
-                venta_sim = getDate.nextInt();
-
-                local.modificar_operador(opcion_auxiliar, nombre_operador, costo_minuto, valor_venta, costo_sim, venta_sim);
-            }; break;
-
-            case 3: // eliminar un operador
-            {
-                System.out.println("----- lista de operadores -----");
-                for (int i = 0; i < local.getLisOper().size() ; i++)
-                {
-                    System.out.println((i+1)+") "+local.getLisOper().get(i).get_nombre());
-                }
-
-                System.out.print("Ingresa el numero de operador a eliminar: ");
-                opcion_auxiliar = getDate.nextInt();
-                getDate.nextLine();
-
-                local.eliminar_operador(opcion_auxiliar);
-            }; break;
-        }
-    }
-
-    // funcion para mostrar el menu crud de las fotocopiadora
-    public static void crud_fotocopiadoras(Negocio local, Scanner getDate)
-    {
-        String tipo;
-        int opcion, opcion_auxiliar, costoHBN, costoHC, valorVentaHC, valorVentaHBN;
-
-        System.out.println("\n1) Crear fotocopiadora");
-        System.out.println("2) Modificar fotocopiadora");
-        System.out.println("3) Eliminar fotocopiadora");
-        System.out.print("Ingresa tu opcion: ");
-        opcion = getDate.nextInt();
-        getDate.nextLine();
-        switch(opcion)
-        {
-            case 1: // crear una nueva fotocopiadora
-            {
-                System.out.print("- Nuevo tipo de fotocopiadora: ");
-                tipo = getDate.nextLine();
-                System.out.print("- Nuevo costo de HBN: ");
-                costoHBN = getDate.nextInt();
-                System.out.print("- Nuevo costo de HC: ");
-                costoHC = getDate.nextInt();
-                System.out.print("- Nuevo valor de venta HC: ");
-                valorVentaHC = getDate.nextInt();
-                System.out.print("- Nuevo valor de venta HBN: ");
-                valorVentaHBN = getDate.nextInt();
-
-                local.crear_fotocopiadora(tipo, costoHBN, costoHC, valorVentaHC, valorVentaHBN);
-
-            }; break;
-
-            case 2: // modificar una fotocopiadora
-            {
-                System.out.println("\n----- lista de fotocopias -----");
-                for (int i = 0; i < local.get_fotolista().size() ; i++)
-                {
-                    System.out.println((i+1) + ") " + local.get_fotolista().get(i).get_nombre());
-                }
-
-                System.out.print("Ingresa el numero de la fotocopiadora a modificar: ");
-                opcion_auxiliar = getDate.nextInt();
-                getDate.nextLine();
-
-                System.out.print("- Nuevo tipo de fotocopiadora: ");
-                tipo = getDate.nextLine();
-                System.out.print("- Nuevo costo de HBN: ");
-                costoHBN = getDate.nextInt();
-                System.out.print("- Nuevo costo de HC: ");
-                costoHC = getDate.nextInt();
-                System.out.print("- Nuevo valor de venta HC: ");
-                valorVentaHC = getDate.nextInt();
-                System.out.print("- Nuevo valor de venta HBN: ");
-                valorVentaHBN = getDate.nextInt();
-
-                local.crear_fotocopiadora(tipo, costoHBN, costoHC, valorVentaHC, valorVentaHBN);
-
-            }; break;
-
-            case 3: // eliminar una fotocopiadora
-            {
-                System.out.println("\n----- lista de fotocopias -----");
-                for (int i = 0; i < local.get_fotolista().size() ; i++)
-                {
-                    System.out.println((i+1) + ") " + local.get_fotolista().get(i).get_nombre());
-                }
-
-                System.out.print("Ingresa el numero de la fotocopiadora a modificar: ");
-                opcion_auxiliar = getDate.nextInt();
-                getDate.nextLine();
-
-                local.eliminar_fotocopiadora(opcion_auxiliar);
-            }; break;
-        }
-    }
-
-
     // funcion para calcular calcular el dinero del dia
     public static void cierre_dia(Negocio local)
     {
@@ -719,13 +530,14 @@ public class Main extends JFrame
 
     public void menu_impresoras()
     {
-        int contador=0;
+        int contador = 0;
 
-        // Llama al archivo de impresoras para almacenarlas
+        // Llama al archivo de impresoras para almacenarlas en una lista
         local.cargar_impresoras();
 
         // Lista con elementos para generar pestañas
         ArrayList<String> elementos = new ArrayList<>();
+
         for (int i=0; i<local.get_fotolista().size(); i++)
         {
             local.usar_foto(i + 1);
@@ -749,6 +561,7 @@ public class Main extends JFrame
             ImageIcon y = new ImageIcon("yellow.png");
             ImageIcon c = new ImageIcon("cyan.png");
             ImageIcon m = new ImageIcon("magenta.png");
+
             JLabel imagen1 = cargar_imagen(imagen,
                                             ((width - 204) / 2),
                                             ((height - 202) / 8),
@@ -808,10 +621,20 @@ public class Main extends JFrame
                     Color.darkGray,
                     local.getFotoP().get_magenta());
 
-            // boton el cierre del dia
+            // botones de seleccion
+            JRadioButton tinta_negra = radio_boton("Blanco y negro",
+                    ((width-192) / 3),
+                    distancia_y(negro),
+                    panel.getBackground());
+            JRadioButton tinta_color = radio_boton("Color",
+                    distancia_x(tinta_negra),
+                    tinta_negra.getY(),
+                    panel.getBackground());
+
+            // boton para usar la impresora
             JButton usar = new JButton("Usar");
             usar.setBounds( (width-150)/2,
-                    distancia_y(negro),
+                    distancia_y(tinta_negra),
                     150,
                     40);
             usar.setFont(new Font("Verdana", 1, 16));
@@ -823,30 +646,42 @@ public class Main extends JFrame
                 public void actionPerformed(ActionEvent e)
                 {
                     impresoras.setVisible(false);
-                    panel_efectivo(local, 1, 2);
+                    panel_efectivo(local,
+                            0,
+                            0,
+                            "Plotter");
                     efectivo.setVisible(true);
                 }
             };
             usar.addActionListener(uso);
 
-            // Agrega el logo y el nombre de la impresora al panel
+            // agrega el logo y el nombre de la impresora al panel
             panel.add(imagen1);
             panel.add(nombre);
 
-            // Agrega los porcentajes de cada tinta
+            // agrega los porcentajes de cada tinta
             panel.add(por_1);
             panel.add(por_2);
             panel.add(por_3);
             panel.add(por_4);
 
-            // Agrega los recuadros de cada tinta
+            // agrega los recuadros de cada tinta
             panel.add(negro);
             panel.add(amarillo);
             panel.add(cian);
             panel.add(magenta);
 
-            // Agregas el boton de usar
+            // agrega los botones de seleccion
+            panel.add(tinta_negra);
+            panel.add(tinta_color);
+
+            // agrega el boton de usar
             panel.add(usar);
+
+            // añade los botones a un grupo de botones
+            ButtonGroup grupo_tinta = new ButtonGroup();
+            grupo_tinta.add(tinta_negra);
+            grupo_tinta.add(tinta_color);
 
             impresoras.addTab(elemento, panel);
         }
@@ -890,7 +725,7 @@ public class Main extends JFrame
         JRadioButton opcion = new JRadioButton(mensaje, true);
         opcion.setBounds(x,
                 y,
-                130,
+                192,
                 30);
         opcion.setForeground(Color.darkGray);
         opcion.setBackground(color);
@@ -905,46 +740,6 @@ public class Main extends JFrame
     public static void main(String[] args)
     {
         String opcion;
-
         Main ventana = new Main();
-
-
-        //local.cargar_impresoras();
-
-
-        /* ciclo para mostrar el menu de opciones
-        do
-        {
-            System.out.println("\n\n***** BIENVENIDO A VARIEDADES TECNOLOGICAS *****");
-            System.out.println("\n(1) Minutos");
-            System.out.println("(2) Fotocopias");
-            System.out.println("(3) CRUD minutos");
-            System.out.println("(4) CRUD fotocopiadora");
-            System.out.println("(5) Cierre Día");
-            System.out.println("(6) Salir");
-
-            System.out.print("\nIngresa tu opcion: ");
-            opcion = getDate.next();
-            getDate.nextLine();
-
-
-            switch (opcion)
-            {
-                case "2":
-                    menu_fotocopias(local,getDate);
-                    break;
-                case "3":
-                    crud_operadores(local, getDate);
-                    break;
-                case "4":
-                    crud_fotocopiadoras(local, getDate);
-                    break;
-                case "5":
-                    cierre_dia(local);
-                    break;
-            }
-        }
-        while(!opcion.equals("5"));
-        */
     }
 }
