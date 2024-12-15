@@ -1,3 +1,5 @@
+//
+
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionListener;
@@ -114,6 +116,10 @@ public class Main extends JFrame
     // metodo para llamar el panel inicial
     private void panel_inicio(Negocio local)
     {
+        // carga los archivos para cargar sus datos en listas
+        local.cargar_operadores();
+        local.cargar_impresoras();
+
         menu_principal.setLayout(null);
         this.getContentPane().add(menu_principal);
         menu_principal.setBackground(Color.lightGray);
@@ -198,9 +204,6 @@ public class Main extends JFrame
     // metodo para llamar el panel de operador
     private void panel_operador(Negocio local)
     {
-        // carga los datos del archivo
-        local.cargar_operadores();
-
         menu_operador.setLayout(null);
         this.getContentPane().add(menu_operador);
         menu_operador.setBackground(Color.lightGray);
@@ -334,10 +337,9 @@ public class Main extends JFrame
     // metodo para llamar el panel de operador
     public void menu_impresoras()
     {
-        int contador = 0;
+        limpiar_pestana(impresoras);
 
-        // Llama al archivo de impresoras para almacenarlas en una lista
-        local.cargar_impresoras();
+        int contador = 0;
 
         // Lista con elementos para generar pestañas
         ArrayList<String> elementos = new ArrayList<>();
@@ -517,6 +519,8 @@ public class Main extends JFrame
     // metodo para vender una impresion normal
     public void vender_impresion(Negocio local, String nombre_impresora, String opcion)
     {
+        limpiar_pestana(foto_menu);
+
         foto_menu.setLayout(null);
         this.getContentPane().add(foto_menu);
         foto_menu.setBackground(Color.lightGray);
@@ -574,13 +578,14 @@ public class Main extends JFrame
                     // desaparece la ventana actual
                     for(int i=0; i<local.get_fotolista().size(); i++)
                     {
-                        if(nombre_impresora == local.get_fotolista().get(i).get_nombre())
+                        if(Objects.equals(nombre_impresora, local.get_fotolista().get(i).get_nombre()))
                         {
                             numero = i;
+                            break;
                         }
                     }
 
-                    if(opcion == "Blanco y negro")
+                    if(Objects.equals(opcion, "Blanco y negro"))
                     {
                         panel_efectivo(local, 2, 1, cantidad, nombre_impresora);
                         local.escribir_impresora(numero, cantidad, 1);
@@ -614,6 +619,8 @@ public class Main extends JFrame
     // metodo para vender una impresion de plotter
     public void vender_impresion(Negocio local, String nombre_impresora)
     {
+        limpiar_pestana(foto_menu);
+
         foto_menu.setLayout(null);
         this.getContentPane().add(foto_menu);
         foto_menu.setBackground(Color.lightGray);
@@ -837,10 +844,6 @@ public class Main extends JFrame
                     }
                     else
                     {
-                        local.registrar(servicio,
-                                local.get_venta(),
-                                local.get_costo());
-
                         efectivo.setVisible(false);
                         menu_principal.setVisible(true);
 
@@ -865,12 +868,34 @@ public class Main extends JFrame
     // metodo para calcular el dinero del dia
     public static void cierre_dia(Negocio local)
     {
-        int ventas, costo = 0, foto_gana, minu_gana;
+        int minutos=0, sim_card=0, ventas=0, costo =0, foto_gana;
+        int sim_gana=0, sim_costo=0;
 
         // estadisticas de operador
-        ventas = local.get_opera().get_recolectado();
-        minu_gana = local.get_opera().get_recolectado() - local.get_opera().get_produccion();
-        costo += (local.get_opera().get_produccion());
+        local.set_venta_minutos();
+        local.set_venta_sim();
+
+        // estadisticas de minutos
+        int minu_venta = local.get_venta_minutos();
+        int minu_costo = local.get_costo_minutos();
+
+        // estadisticas de sim card
+        sim_gana = local.get_venta_sim();
+        sim_costo = local.get_costo_sim();
+
+        // valores totales de operador
+        int total_venta_operador = sim_gana + minu_venta;
+        int total_costo_operador = sim_costo + minu_costo;
+
+
+        for(int i=0; i<local.getLisOper().size(); i++)
+        {
+            System.out.println("Operador: $" + local.getLisOper().get(i).get_nombre());
+            System.out.println("- Minutos: " + local.getLisOper().get(i).get_cantidad_minutos());
+            System.out.println("- SIM Card: " + local.getLisOper().get(i).get_cantidad_sim());
+            sim_card += local.getLisOper().get(i).get_cantidad_sim();
+            minutos += local.getLisOper().get(i).get_cantidad_minutos();
+        }
 
         // rendimiento de las fotocopias
         ventas += local.getFotoP().get_recolectado();
@@ -881,17 +906,19 @@ public class Main extends JFrame
 
         System.out.println("******************** CIERRE DEL DIA ********************");
         System.out.println("VALOR RECOLECTADO: $" + ventas);
-        System.out.println(">>>>> GANANCIAS TOTALES: $" + ((foto_gana+minu_gana) - costo));
-        System.out.println("      - OPERADORES: $" + (minu_gana));
-        System.out.println("      - FOTOCOPIAS: $" + (foto_gana));
+        System.out.println(">>>>> GANANCIAS TOTALES: $" + ((foto_gana+ minu_venta) - costo));
+        System.out.println("      - OPERADORES: $" + total_venta_operador);
+        System.out.println("      - Minutos totales: " + minutos);
+        System.out.println("      - SIM Card: " + sim_card);
+        System.out.println("      - FOTOCOPIAS: $" + foto_gana);
         System.out.println("***** COSTOS DE PRODUCCION: $" + costo);
 
         // muestra el servicio mas rentable junto a sus ganancias
-        if(minu_gana > foto_gana)
+        if(minu_venta > foto_gana)
         {
-            System.out.println("----- servicio mas rentable: MINUTOS ($" + minu_gana + ") -----");
+            System.out.println("----- servicio mas rentable: MINUTOS ($" + minu_venta + ") -----");
         }
-        else if(foto_gana > minu_gana)
+        else if(foto_gana > minu_venta)
         {
             System.out.println("----- servicio mas rentable: FOTOCOPIAS ($" + foto_gana + ") -----");
         }
@@ -946,6 +973,22 @@ public class Main extends JFrame
                 22));
         return opcion;
     }
+
+    public void limpiar_pestana(JTabbedPane tabulado)
+    {
+        // Limpia las pestañas existentes
+        tabulado.removeAll();
+        tabulado.revalidate();
+        tabulado.repaint();
+    }
+    public void limpiar_pestana(JPanel panel)
+    {
+        // Limpia las pestañas existentes
+        panel.removeAll();
+        panel.revalidate();
+        panel.repaint();
+    }
+
 
 
     // metodo para inicializar el programa

@@ -2,28 +2,35 @@ import java.io.*;
 import java.util.ArrayList;
 import java.util.Objects;
 
-public class Negocio
-{
+public class Negocio {
     // objetos de los servicios
     private Fotocopiadora fotoP;
     private Operador opera;
+
 
     // listas de los servicios
     private ArrayList<Operador> lista_operador;
     private ArrayList<Fotocopiadora> foto_lista;
 
+
     // rendimiento de ganancia/produccion
     private int venta;
     private int costo;
+
 
     // costos diarios de produccion
     private int costo_energia;
     private int costo_mpleado;
 
+    // atributos de rendimiento
+    private int venta_minutos;
+    private int costo_minutos;
+    private int venta_sim;
+    private int costo_sim;
+
 
     // -------------------- constructor del negocio --------------------
-    public Negocio(int costo_mpleado, int costo_energia)
-    {
+    public Negocio(int costo_mpleado, int costo_energia) {
         // lista de los operadores
         lista_operador = new ArrayList<>();
 
@@ -41,6 +48,7 @@ public class Negocio
     public void set_opera(Operador opera) {
         this.opera = opera;
     }
+
     public Operador get_opera() {
         return opera;
     }
@@ -48,13 +56,13 @@ public class Negocio
     public void setLisOper(ArrayList<Operador> lisOper) {
         this.lista_operador = lisOper;
     }
+
     public ArrayList<Operador> getLisOper() {
         return lista_operador;
     }
 
     // metodo para usar el objeto del operador
-    public void usar_opera(int posicion)
-    {
+    public void usar_opera(int posicion) {
         this.opera = lista_operador.get(posicion);
     }
 
@@ -63,14 +71,15 @@ public class Negocio
     public void setFotoP(Fotocopiadora fotoP) {
         this.fotoP = fotoP;
     }
+
     public Fotocopiadora getFotoP() {
         return fotoP;
     }
 
-    public void set_fotolista(ArrayList<Fotocopiadora> lista_fotocopiadora)
-    {
+    public void set_fotolista(ArrayList<Fotocopiadora> lista_fotocopiadora) {
         this.foto_lista = lista_fotocopiadora;
     }
+
     public ArrayList<Fotocopiadora> get_fotolista() {
         return foto_lista;
     }
@@ -81,57 +90,36 @@ public class Negocio
     }
 
 
-// registrar la venta en el negocio
-    public boolean registrar(int servicio, int efectivo, int costo)
-    {
-        if (servicio == 1) // minutos
-        {
-            this.opera.set_recolectado(efectivo);
-            this.opera.set_produccion(costo);
-        }
-        else // fotocopiadoras
-        {
-            this.fotoP.set_recolectado(efectivo);
-            this.fotoP.set_produccion(costo);
-        }
-        return true;
-    }
-
-
     // valor del costo total
-    public void set_total(int opcion, int cantidad, String nombre)
-    {
+    public void set_total(int opcion, int cantidad, String nombre) {
         int posicion = 0;
 
-        for(int i=0; i<getLisOper().size(); i++)
-        {
-            if(Objects.equals(getLisOper().get(i).get_nombre(), nombre))
-            {
+        for (int i = 0; i < getLisOper().size(); i++) {
+            if (Objects.equals(getLisOper().get(i).get_nombre(), nombre)) {
                 posicion = i;
                 break;
             }
         }
 
-        if(opcion == 1) // llamar
+        if (opcion == 1) // llamar
         {
             venta = cantidad * getLisOper().get(posicion).get_venta_minuto();
             costo = cantidad * getLisOper().get(posicion).get_costo_minuto();
-        }
-        else // sim card
+            getLisOper().get(posicion).set_cantidad_minutos(cantidad);
+        } else // sim card
         {
             venta = cantidad * getLisOper().get(posicion).get_venta_sim();
             costo = cantidad * getLisOper().get(posicion).get_costo_sim();
+            getLisOper().get(posicion).set_cantidad_sim(cantidad);
         }
     }
-// total de las fotocopias
-    public void set_total(String nombre, int area_can, int impresion)
-    {
+
+    // total de las fotocopias
+    public void set_total(String nombre, int area_can, int impresion) {
         int posicion = 0;
 
-        for(int i=0; i<get_fotolista().size(); i++)
-        {
-            if(Objects.equals(get_fotolista().get(i).get_nombre(), nombre))
-            {
+        for (int i = 0; i < get_fotolista().size(); i++) {
+            if (Objects.equals(get_fotolista().get(i).get_nombre(), nombre)) {
                 posicion = i;
                 break;
             }
@@ -142,20 +130,18 @@ public class Negocio
         {
             venta = area_can * get_fotolista().get(posicion).get_valor_venta_c();
             costo = area_can * get_fotolista().get(posicion).get_costo_c();
-        }
-        else // blanco y negro
+        } else // blanco y negro
         {
             venta = area_can * get_fotolista().get(posicion).get_valor_venta_bn();
             costo = area_can * get_fotolista().get(posicion).get_costo_bn();
         }
     }
-    public int get_venta()
-    {
+
+    public int get_venta() {
         return venta;
     }
 
-    public int get_costo()
-    {
+    public int get_costo() {
         return costo;
     }
 
@@ -164,6 +150,7 @@ public class Negocio
     public void setCosto_energia(int costo_energia) {
         this.costo_energia = costo_energia;
     }
+
     public int getCosto_energia() {
         return costo_energia;
     }
@@ -171,19 +158,18 @@ public class Negocio
     public void setCosto_mpleado(int costo_mpleado) {
         this.costo_mpleado = costo_mpleado;
     }
+
     public int getCosto_mpleado() {
         return costo_mpleado;
     }
 
 
-// -------------------- funcion para cargar los operadores --------------------
+    // -------------------- funcion para cargar los operadores --------------------
     public void cargar_operadores() {
-        try
-        {
+        try {
             BufferedReader leer = new BufferedReader(new FileReader("operadores.txt"));
             String line;
-            while ((line = leer.readLine()) != null)
-            {
+            while ((line = leer.readLine()) != null) {
                 // separa los datos por comas
                 String[] datos = line.split(",");
 
@@ -198,23 +184,18 @@ public class Negocio
             }
             leer.close();
             opera = lista_operador.get(0);
-        }
-        catch (IOException error)
-        {
+        } catch (IOException error) {
             System.out.println(error.getMessage());
         }
     }
 
 
-// funcion para cargar las impresoras
-    public void cargar_impresoras()
-    {
-        try
-        {
+    // funcion para cargar las impresoras
+    public void cargar_impresoras() {
+        try {
             BufferedReader reader = new BufferedReader(new FileReader("impresoras.txt"));
             String line;
-            while ((line = reader.readLine()) != null)
-            {
+            while ((line = reader.readLine()) != null) {
                 // separa cada linea por comas
                 String[] datos = line.split(",");
 
@@ -234,80 +215,69 @@ public class Negocio
                 double consumo_magenta = Double.parseDouble(datos[11]);
 
                 Fotocopiadora nueva = new Fotocopiadora(nombre,
-                                                        costoHBN,
-                                                        costoHC,
-                                                        valorVentaHC,
-                                                        valorVentaHBN,
-                                                        negro, amarillo,
-                                                        cian,
-                                                        magenta,
-                                                        consumo_negro,
-                                                        consumo_ci_am,
-                                                        consumo_magenta);
+                        costoHBN,
+                        costoHC,
+                        valorVentaHC,
+                        valorVentaHBN,
+                        negro, amarillo,
+                        cian,
+                        magenta,
+                        consumo_negro,
+                        consumo_ci_am,
+                        consumo_magenta);
                 this.foto_lista.add(nueva);  // agrega la nueva fotocopiadora a la lista
             }
             reader.close();
             fotoP = foto_lista.get(0);
-        }
-        catch (IOException error)
-        {
+        } catch (IOException error) {
             System.out.println(error.getMessage());
         }
     }
 
 
-// metodo para escribir en el archivo de las impresoras
-    public void escribir_impresora(int impresora, int cantidad, int tinta)
-    {
+    // metodo para escribir en el archivo de las impresoras
+    public void escribir_impresora(int impresora, int cantidad, int tinta) {
         String archivo = "impresoras.txt";
         String linea;
         ArrayList<String> lineas = new ArrayList<>();
 
-        try
-        {
+        try {
             // guardar cada linea en una lista
             System.out.println("\nContenido del archivo:");
-            for(int posicion=0; posicion<foto_lista.size(); posicion++)
-            {
+            for (int posicion = 0; posicion < foto_lista.size(); posicion++) {
                 linea = (foto_lista.get(posicion).get_nombre()
                         + ","
                         + foto_lista.get(posicion).get_costo_bn()
                         + ","
-                        + foto_lista.get(posicion).get_valor_venta_c()
-                        + ","
                         + foto_lista.get(posicion).get_valor_venta_bn()
+                        + ","
+                        + foto_lista.get(posicion).get_valor_venta_c()
                         + ","
                         + foto_lista.get(posicion).get_costo_c()
                         + ",");
 
                 // disminuye el porcentaje de la tinta a utilizar
-                if((posicion+1) == impresora)
-                {
-                    if(tinta == 1)
-                    {
+                if (posicion == impresora) {
+                    if (tinta == 1) {
                         linea += (foto_lista.get(posicion).get_negro())
                                 + ","
-                                + ( foto_lista.get(posicion).get_amarillo() - (cantidad*foto_lista.get(posicion).get_consumo_ci_am()) )
+                                + (foto_lista.get(posicion).get_amarillo() - (cantidad * foto_lista.get(posicion).get_consumo_ci_am()))
                                 + ","
-                                + ( foto_lista.get(posicion).get_cian() - (cantidad*foto_lista.get(posicion).get_consumo_ci_am()) )
+                                + (foto_lista.get(posicion).get_cian() - (cantidad * foto_lista.get(posicion).get_consumo_ci_am()))
                                 + ","
-                                + ( foto_lista.get(posicion).get_magenta() - (cantidad*foto_lista.get(posicion).get_consumo_magenta()) )
+                                + (foto_lista.get(posicion).get_magenta() - (cantidad * foto_lista.get(posicion).get_consumo_magenta()))
+                                + ",";
+                    } else {
+                        linea += (foto_lista.get(posicion).get_negro() - (cantidad * foto_lista.get(posicion).get_consumo_negro()))
+                                + ","
+                                + (foto_lista.get(posicion).get_amarillo())
+                                + ","
+                                + (foto_lista.get(posicion).get_cian())
+                                + ","
+                                + (foto_lista.get(posicion).get_magenta())
                                 + ",";
                     }
-                    else
-                    {
-                        linea += ( foto_lista.get(posicion).get_negro() - (cantidad*foto_lista.get(posicion).get_consumo_negro()) )
-                                + ","
-                                + ( foto_lista.get(posicion).get_amarillo())
-                                + ","
-                                + ( foto_lista.get(posicion).get_cian())
-                                + ","
-                                + ( foto_lista.get(posicion).get_magenta())
-                                + ",";
-                    }
-                }
-                else
-                {
+                } else {
                     linea += (foto_lista.get(posicion).get_negro()
                             + ","
                             + foto_lista.get(posicion).get_amarillo()
@@ -328,26 +298,62 @@ public class Negocio
             }
 
             // escribe las líneas de vuelta al archivo
-            try (BufferedWriter escribir = new BufferedWriter(new FileWriter(archivo)))
-            {
-                for (String l : lineas)
-                {
+            try (BufferedWriter escribir = new BufferedWriter(new FileWriter(archivo))) {
+                for (String l : lineas) {
                     escribir.write(l);
                     escribir.newLine();
                 }
             }
             System.out.println("----- la línea ha sido modificada exitosamente -----");
-        }
-        catch(IOException error)
-        {
+        } catch (IOException error) {
             System.out.println(error.getMessage());
         }
     }
 
 
-// metodo para redondear numeros en dos decimales
-    public double redondear(double numero)
-    {
-        return Math.round(numero*100) / 100;
+    // metodo para redondear numeros en dos decimales
+    public double redondear(double numero) {
+        return Math.round(numero * 100) / 100;
     }
+
+
+// metodos para calcular el costo y venta total de los minutos
+    public void set_venta_minutos()
+    {
+        for (int i = 0; i < getLisOper().size(); i++)
+        {
+            // cantidad de minutos por valor de venta
+            venta_minutos += getLisOper().get(i).get_cantidad_minutos() * getLisOper().get(i).get_venta_minuto();
+            costo_minutos += getLisOper().get(i).get_cantidad_minutos() * getLisOper().get(i).get_venta_minuto();
+        }
+    }
+    public int get_venta_minutos()
+    {
+        return venta_minutos;
+    }
+    public int get_costo_minutos()
+    {
+        return costo_minutos;
+    }
+
+
+// metodos para calcular el costo y venta total de los minutos
+    public void set_venta_sim()
+    {
+        for (int i = 0; i < getLisOper().size(); i++)
+        {
+            // cantidad de minutos por valor de venta
+            venta_sim += getLisOper().get(i).get_cantidad_sim() * getLisOper().get(i).get_venta_minuto();
+            costo_sim += getLisOper().get(i).get_cantidad_sim() * getLisOper().get(i).get_costo_minuto();
+        }
+    }
+    public int get_venta_sim()
+    {
+        return venta_minutos;
+    }
+    public int get_costo_sim()
+    {
+        return costo_minutos;
+    }
+
 }

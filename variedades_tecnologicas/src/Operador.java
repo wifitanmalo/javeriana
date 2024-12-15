@@ -9,18 +9,24 @@ public class Operador
 
 
 // atributos de rendimiento
-    private int recolectado;
-    private int produccion;
+    private int cantidad_minutos;
+    private int cantidad_sim;
 
 
 // -------------------- constructor del operador --------------------
-    public Operador(String nombre, int costo, int valor_venta, int costo_sim, int venta_sim)
+    public Operador(String nombre,
+                    int costo,
+                    int valor_venta,
+                    int costo_sim,
+                    int venta_sim)
     {
         this.nombre = nombre;
         this.costo = costo;
         this.valor_venta = valor_venta;
         this.costo_sim = costo_sim;
         this.venta_sim = venta_sim;
+        this.cantidad_minutos = 0;
+        this.cantidad_sim = 0;
     }
 
 
@@ -70,25 +76,24 @@ public class Operador
         return venta_sim;
     }
 
-
 //  metodos para adicionar el valor recolectado del dia
-    public void set_recolectado(int efectivo)
+    public void set_cantidad_minutos(int efectivo)
     {
-        this.recolectado = this.recolectado + efectivo;
+        this.cantidad_minutos = this.cantidad_minutos + efectivo;
     }
-    public int get_recolectado()
+    public int get_cantidad_minutos()
     {
-        return recolectado;
+        return cantidad_minutos;
     }
-
 
 // metodos para adicionar el costo de produccion del dia
-    public void set_produccion(int costo)
+    public void set_cantidad_sim(int costo)
     {
-        this.produccion = this.produccion + costo;
+        this.cantidad_sim = this.cantidad_sim + costo;
     }
-    public int get_produccion()
+    public int get_cantidad_sim()
     {
-        return produccion;
+        return cantidad_sim;
     }
 }
+
