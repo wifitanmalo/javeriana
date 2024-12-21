@@ -1,14 +1,15 @@
 public class Fotocopiadora
 {
 
-// atributos predeterminadods
+    // atributos predeterminadods
     private String nombre;
     private int costo_bn;
     private int costo_c;
     private int valor_venta_bn;
     private int valor_venta_c;
 
-// atributos de tinta
+
+    // atributos de tinta
     private double negro;
     private double amarillo;
     private double cian;
@@ -16,11 +17,14 @@ public class Fotocopiadora
     private double consumo_negro;
     private double consumo_ci_am;
     private double consumo_magenta;
-    private int recarga;
 
-// atributos de rendimiento
-    private int recolectado;
-    private int produccion;
+
+    // atributos de cantidades vendidas
+    private int cantidad_bn;
+    private int cantidad_c;
+    private int cantidad_plano;
+    private int cantidad_afiche;
+    private double tinta_consumida;
 
 
 // ---------- constructor predeterminado ----------
@@ -42,7 +46,6 @@ public class Fotocopiadora
         this.costo_c = costoHC;
         this.valor_venta_bn = valorVentaHC;
         this.valor_venta_c = valorVentaHBN;
-        this.recolectado = 0;
 
         this.negro = negro;
         this.amarillo = amarillo;
@@ -52,10 +55,18 @@ public class Fotocopiadora
         this.consumo_negro = consumo_negro;
         this.consumo_ci_am = consumo_ci_am;
         this.consumo_magenta = consumo_magenta;
+
+        this.cantidad_bn = 0;
+        this.cantidad_c = 0;
+        this.cantidad_plano = 0;
+        this.cantidad_afiche = 0;
+        this.tinta_consumida = 0;
     }
 
 
-// metodos predeterminados de las fotocopiadoras
+
+// ---------- METODOS QUE DEFINEN LOS ATRIBUTOS DE LA IMPRESORA ----------
+    // nombre de la impresora
     public void set_nombre(String nombre)
     {
         this.nombre = nombre;
@@ -65,6 +76,7 @@ public class Fotocopiadora
         return nombre;
     }
 
+    // costo por hoja en blanco y negro o por area del plano
     public void set_costo_bn(int costo_bn)
     {
         this.costo_bn = costo_bn;
@@ -74,6 +86,7 @@ public class Fotocopiadora
         return costo_bn;
     }
 
+    // costo por hoja a color o por area del afiche
     public void set_costo_c(int costo_c)
     {
         this.costo_c = costo_c;
@@ -83,6 +96,7 @@ public class Fotocopiadora
         return costo_c;
     }
 
+    // precio de venta por hoja en blanco y negro o por area del plano
     public void set_valor_venta_bn(int valor_venta_bn)
     {
         this.valor_venta_bn = valor_venta_bn;
@@ -92,6 +106,7 @@ public class Fotocopiadora
         return valor_venta_bn;
     }
 
+    // precio de venta por hoja a color o por area del afiche
     public void set_valor_venta_c(int valor_venta_c)
     {
         this.valor_venta_c = valor_venta_c;
@@ -102,38 +117,19 @@ public class Fotocopiadora
     }
 
 
-// metodos para adicionar el valor recolectado del dia
-    public void set_recolectado(int efectivo)
-    {
-        this.recolectado = this.recolectado + efectivo;
-    }
-    public int get_recolectado()
-    {
-        return recolectado;
-    }
 
-
-// metodos para adicionar el costo de produccion del dia
-    public void set_produccion(int costo)
-    {
-        this.produccion = this.produccion + costo;
-    }
-    public int get_produccion()
-    {
-        return produccion;
-    }
-
-
-// metodos para definir y obtener las tintas
+// ---------- METODOS PARA DEFINIR LA CANTIDAD DE TINTA DISPONIBLE ----------
+    // porcentaje de tinta negra
     public void set_negro(double blanco_negro)
     {
         this.negro = blanco_negro;
     }
-        public double get_negro()
+    public double get_negro()
         {
             return negro;
         }
 
+    // porcentaje de tinta amarilla
     public void set_amarillo(double amarillo)
     {
         this.amarillo = amarillo;
@@ -143,6 +139,7 @@ public class Fotocopiadora
         return amarillo;
     }
 
+    // porcentaje de tinta cian
     public void set_cian(double cian) {
         this.cian = cian;
     }
@@ -150,6 +147,7 @@ public class Fotocopiadora
         return cian;
     }
 
+    // porcentaje de tinta magenta
     public void set_magenta(double magenta)
     {
         this.magenta = magenta;
@@ -160,7 +158,9 @@ public class Fotocopiadora
     }
 
 
-// metodos para definir y obtener los consumos de tinta
+
+// ---------- METODOS PARA DEFINIR LOS CONSUMOS DE TINTA ----------
+    // consumo consumido de tinta negra por impresion
     public void set_consumo_negro(double consumo_negro)
     {
         this.consumo_negro = consumo_negro;
@@ -170,6 +170,7 @@ public class Fotocopiadora
         return consumo_negro;
     }
 
+    // porcentaje consumido de tinta amarilla y cian por impresion
     public void set_consumo_ci_am(double consumo_color)
     {
         this.consumo_ci_am = consumo_color;
@@ -179,6 +180,7 @@ public class Fotocopiadora
         return consumo_ci_am;
     }
 
+    // porcentaje consumido de tinta magenta por impresion
     public void set_consumo_magenta(double consumo_color)
     {
         this.consumo_magenta = consumo_color;
@@ -189,13 +191,60 @@ public class Fotocopiadora
     }
 
 
-// metodos para definir y obtener el valor de recarga
-    public void set_recarga(int recarga)
+
+// ---------- METODOS PARA CALCULAR LAS CANTIDADES TOTALES ----------
+    // cantidad de hojas a blanco y negro
+    public void set_cantidad_bn(int cantidad)
     {
-        this.recarga = recarga;
+        this.cantidad_bn += cantidad;
     }
-    public int get_recarga()
+    public int get_cantidad_bn()
     {
-        return recarga;
+        return cantidad_bn;
+    }
+
+    // cantidad de hojas a color
+    public void set_cantidad_c(int cantidad)
+    {
+        this.cantidad_c += cantidad;
+    }
+    public int get_cantidad_c()
+    {
+        return cantidad_c;
+    }
+
+    // cantidad del area de los planos
+    public void set_cantidad_plano(int cantidad)
+    {
+        this.cantidad_plano += cantidad;
+    }
+    public int get_cantidad_plano()
+    {
+        return cantidad_plano;
+    }
+
+    // cantidad del area de los afiches
+    public void set_cantidad_afiche(int cantidad)
+    {
+        this.cantidad_afiche += cantidad;
+    }
+    public int get_cantidad_afiche()
+    {
+        return cantidad_afiche;
+    }
+
+
+
+// ---------- METODOS PARA CALCULAR LA CANTIDAD DE TINTA CONSUMIDA ----------
+    public void set_tinta_consumida(double porcentaje)
+    {
+        this.cantidad_c += porcentaje;
+    }
+    public double get_tinta_consumida()
+    {
+        return tinta_consumida;
     }
 }
+
+
+

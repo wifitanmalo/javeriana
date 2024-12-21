@@ -22,12 +22,6 @@ public class Negocio {
     private int costo_energia;
     private int costo_mpleado;
 
-    // atributos de rendimiento
-    private int venta_minutos;
-    private int costo_minutos;
-    private int venta_sim;
-    private int costo_sim;
-
 
     // -------------------- constructor del negocio --------------------
     public Negocio(int costo_mpleado, int costo_energia) {
@@ -90,6 +84,8 @@ public class Negocio {
     }
 
 
+
+// ---------- METODOS PARA DEFINIR LOS VALORES TOTALES ----------
     // valor del costo total
     public void set_total(int opcion, int cantidad, String nombre) {
         int posicion = 0;
@@ -106,7 +102,8 @@ public class Negocio {
             venta = cantidad * getLisOper().get(posicion).get_venta_minuto();
             costo = cantidad * getLisOper().get(posicion).get_costo_minuto();
             getLisOper().get(posicion).set_cantidad_minutos(cantidad);
-        } else // sim card
+        }
+        else // sim card
         {
             venta = cantidad * getLisOper().get(posicion).get_venta_sim();
             costo = cantidad * getLisOper().get(posicion).get_costo_sim();
@@ -115,56 +112,81 @@ public class Negocio {
     }
 
     // total de las fotocopias
-    public void set_total(String nombre, int area_can, int impresion) {
+    public void set_total(String nombre, int cantidad, int impresion) {
         int posicion = 0;
 
-        for (int i = 0; i < get_fotolista().size(); i++) {
-            if (Objects.equals(get_fotolista().get(i).get_nombre(), nombre)) {
+        for (int i = 0; i < get_fotolista().size(); i++)
+        {
+            if (Objects.equals(get_fotolista().get(i).get_nombre(), nombre))
+            {
                 posicion = i;
                 break;
             }
         }
 
         // formula = cantidad * venta de hoja
-        if (impresion == 1) // color
+        if (impresion == 1) // color o afiche
         {
-            venta = area_can * get_fotolista().get(posicion).get_valor_venta_c();
-            costo = area_can * get_fotolista().get(posicion).get_costo_c();
-        } else // blanco y negro
+            venta = cantidad * get_fotolista().get(posicion).get_valor_venta_c();
+            costo = cantidad * get_fotolista().get(posicion).get_costo_c();
+
+            if(Objects.equals(get_fotolista().get(posicion).get_nombre(), "Plotter"))
+            {
+                get_fotolista().get(posicion).set_cantidad_afiche(cantidad);
+            }
+            else
+            {
+                get_fotolista().get(posicion).set_cantidad_c(cantidad);
+            }
+        }
+        else // blanco y negro o plano
         {
-            venta = area_can * get_fotolista().get(posicion).get_valor_venta_bn();
-            costo = area_can * get_fotolista().get(posicion).get_costo_bn();
+            venta = cantidad * get_fotolista().get(posicion).get_valor_venta_bn();
+            costo = cantidad * get_fotolista().get(posicion).get_costo_bn();
+
+            if(Objects.equals(get_fotolista().get(posicion).get_nombre(), "Plotter"))
+            {
+                get_fotolista().get(posicion).set_cantidad_plano(cantidad);
+            }
+            else
+            {
+                get_fotolista().get(posicion).set_cantidad_bn(cantidad);
+            }
         }
     }
 
     public int get_venta() {
         return venta;
     }
-
-    public int get_costo() {
+    public int get_costo()
+    {
         return costo;
     }
 
 
-    // metodos para definir y obtener la deuda diaria del negocio
-    public void setCosto_energia(int costo_energia) {
+
+// ---------- METODOS PARA DEFINIR EL COSTO DIARIO DEL NEGOCIO ----------
+    // costo de la energia
+    public void setCosto_energia(int costo_energia)
+    {
         this.costo_energia = costo_energia;
     }
-
     public int getCosto_energia() {
         return costo_energia;
     }
 
+    // costo del empleador
     public void setCosto_mpleado(int costo_mpleado) {
         this.costo_mpleado = costo_mpleado;
     }
-
     public int getCosto_mpleado() {
         return costo_mpleado;
     }
 
 
-    // -------------------- funcion para cargar los operadores --------------------
+
+// ---------- METODOS PARA CARGAR Y ESCRIBIR ARCHIVOS ----------
+    // cargar el archivo de los operadores
     public void cargar_operadores() {
         try {
             BufferedReader leer = new BufferedReader(new FileReader("operadores.txt"));
@@ -189,14 +211,15 @@ public class Negocio {
         }
     }
 
-
-    // funcion para cargar las impresoras
-    public void cargar_impresoras() {
+    // cargar el archivo de las impresoras
+    public void cargar_impresoras()
+    {
         try {
             BufferedReader reader = new BufferedReader(new FileReader("impresoras.txt"));
             String line;
-            while ((line = reader.readLine()) != null) {
-                // separa cada linea por comas
+            while ((line = reader.readLine()) != null)
+            {
+                // separa cada linea en base a las comas
                 String[] datos = line.split(",");
 
                 String nombre = datos[0];
@@ -229,13 +252,13 @@ public class Negocio {
             }
             reader.close();
             fotoP = foto_lista.get(0);
-        } catch (IOException error) {
+        } catch (IOException error)
+        {
             System.out.println(error.getMessage());
         }
     }
 
-
-    // metodo para escribir en el archivo de las impresoras
+    // escribir en el archivo de las impresoras
     public void escribir_impresora(int impresora, int cantidad, int tinta) {
         String archivo = "impresoras.txt";
         String linea;
@@ -311,49 +334,93 @@ public class Negocio {
     }
 
 
-    // metodo para redondear numeros en dos decimales
-    public double redondear(double numero) {
-        return Math.round(numero * 100) / 100;
-    }
 
-
-// metodos para calcular el costo y venta total de los minutos
-    public void set_venta_minutos()
+// ---------- METODOS PARA CALCULAR EL CIERRE DEL DIA ----------
+    // venta total de operador
+    public int ganancia_operador()
     {
-        for (int i = 0; i < getLisOper().size(); i++)
-        {
-            // cantidad de minutos por valor de venta
+        int venta_minutos = 0;
+        int venta_sim = 0;
+
+        // cantidad por venta
+        for (int i = 0; i < getLisOper().size(); i++) {
             venta_minutos += getLisOper().get(i).get_cantidad_minutos() * getLisOper().get(i).get_venta_minuto();
-            costo_minutos += getLisOper().get(i).get_cantidad_minutos() * getLisOper().get(i).get_venta_minuto();
+            venta_sim += getLisOper().get(i).get_cantidad_sim() * getLisOper().get(i).get_venta_sim();
         }
-    }
-    public int get_venta_minutos()
-    {
-        return venta_minutos;
-    }
-    public int get_costo_minutos()
-    {
-        return costo_minutos;
+        return venta_minutos + venta_sim;
     }
 
+    // costo total de operador
+    public int costo_operador() {
+        int costo_minutos = 0;
+        int costo_sim = 0;
 
-// metodos para calcular el costo y venta total de los minutos
-    public void set_venta_sim()
+        // cantidad por costo
+        for (int i = 0; i < getLisOper().size(); i++) {
+            costo_minutos += getLisOper().get(i).get_cantidad_minutos() * getLisOper().get(i).get_costo_minuto();
+            costo_sim += getLisOper().get(i).get_cantidad_sim() * getLisOper().get(i).get_costo_sim();
+        }
+        return costo_minutos + costo_sim;
+    }
+
+    // venta total de impresora
+    public int ganancia_impresora()
     {
-        for (int i = 0; i < getLisOper().size(); i++)
+        int venta_negro = 0;
+        int venta_color = 0;
+        int venta_afiche = 0;
+        int venta_plano = 0;
+
+
+        // cantidad por venta
+        for (int i = 0; i < get_fotolista().size(); i++)
         {
-            // cantidad de minutos por valor de venta
-            venta_sim += getLisOper().get(i).get_cantidad_sim() * getLisOper().get(i).get_venta_minuto();
-            costo_sim += getLisOper().get(i).get_cantidad_sim() * getLisOper().get(i).get_costo_minuto();
+            // cantidad/area por valor venta
+            if(Objects.equals(get_fotolista().get(i).get_nombre(), "Plotter"))
+            {
+                venta_afiche += get_fotolista().get(i).get_cantidad_afiche() * get_fotolista().get(i).get_valor_venta_bn();
+                venta_plano += get_fotolista().get(i).get_cantidad_plano() * get_fotolista().get(i).get_valor_venta_c();
+            }
+            else
+            {
+                venta_negro += get_fotolista().get(i).get_cantidad_bn() * get_fotolista().get(i).get_valor_venta_bn();
+                venta_color += get_fotolista().get(i).get_cantidad_c() * get_fotolista().get(i).get_valor_venta_c();
+            }
         }
+        return (venta_negro+venta_color) + (venta_afiche+venta_plano);
     }
-    public int get_venta_sim()
+
+    // costo total de impresora
+    public int costo_impresora()
     {
-        return venta_minutos;
+        int costo_negro = 0;
+        int costo_color = 0;
+        int costo_afiche = 0;
+        int costo_plano = 0;
+
+
+        // cantidad por venta
+        for (int i = 0; i < get_fotolista().size(); i++)
+        {
+            // cantidad/area por el costo
+            if(Objects.equals(get_fotolista().get(i).get_nombre(), "Plotter"))
+            {
+                costo_afiche += get_fotolista().get(i).get_cantidad_afiche() * get_fotolista().get(i).get_costo_bn();
+                costo_plano += get_fotolista().get(i).get_cantidad_plano() * get_fotolista().get(i).get_costo_c();
+            }
+            else
+            {
+                costo_negro += get_fotolista().get(i).get_cantidad_bn() * get_fotolista().get(i).get_costo_bn();
+                costo_color += get_fotolista().get(i).get_cantidad_c() * get_fotolista().get(i).get_costo_c();
+            }
+        }
+        return (costo_negro+costo_color) + (costo_afiche+costo_plano);
     }
-    public int get_costo_sim()
+
+    // metodo para redondear numeros en dos decimales
+    public double redondear(double numero)
     {
-        return costo_minutos;
+        return Math.round(numero*100) / 100;
     }
 
 }

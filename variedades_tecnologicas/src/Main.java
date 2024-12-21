@@ -27,6 +27,7 @@ public class Main extends JFrame
     private JPanel efectivo = new JPanel();
     private JPanel menu_operador = new JPanel();
     private JPanel foto_menu = new JPanel();
+    private JPanel cierre = new JPanel();
 
 
     // ---------- constructor de la clase Main ----------
@@ -866,61 +867,89 @@ public class Main extends JFrame
 
 
     // metodo para calcular el dinero del dia
-    public static void cierre_dia(Negocio local)
+    public void cierre_dia(Negocio local)
     {
-        int minutos=0, sim_card=0, ventas=0, costo =0, foto_gana;
-        int sim_gana=0, sim_costo=0;
+        int minutos = 0;
+        int sim_card = 0;
 
-        // estadisticas de operador
-        local.set_venta_minutos();
-        local.set_venta_sim();
+        int blanco_negro = 0;
+        int color = 0;
+        int area = 0;
+
+
+        cierre.setLayout(null);
+        this.getContentPane().add(cierre);
+        cierre.setBackground(Color.lightGray);
+
 
         // estadisticas de minutos
-        int minu_venta = local.get_venta_minutos();
-        int minu_costo = local.get_costo_minutos();
+        int ganancia_operador = local.ganancia_operador();
+        int costo_operador = local.costo_operador();
 
-        // estadisticas de sim card
-        sim_gana = local.get_venta_sim();
-        sim_costo = local.get_costo_sim();
-
-        // valores totales de operador
-        int total_venta_operador = sim_gana + minu_venta;
-        int total_costo_operador = sim_costo + minu_costo;
+        // estadisticas de impresoras
+        int ganancia_impresora = local.ganancia_impresora();
+        int costo_impresora = local.costo_impresora();
 
 
+        System.out.println("\n----- OPERADORES -----");
         for(int i=0; i<local.getLisOper().size(); i++)
         {
-            System.out.println("Operador: $" + local.getLisOper().get(i).get_nombre());
+            System.out.println("Operador: " + local.getLisOper().get(i).get_nombre());
             System.out.println("- Minutos: " + local.getLisOper().get(i).get_cantidad_minutos());
             System.out.println("- SIM Card: " + local.getLisOper().get(i).get_cantidad_sim());
             sim_card += local.getLisOper().get(i).get_cantidad_sim();
             minutos += local.getLisOper().get(i).get_cantidad_minutos();
         }
 
-        // rendimiento de las fotocopias
-        ventas += local.getFotoP().get_recolectado();
-        foto_gana = local.getFotoP().get_recolectado() - local.getFotoP().get_produccion();
-        costo += (local.getFotoP().get_produccion()
-                + local.getCosto_mpleado()
-                + local.getCosto_energia());
 
-        System.out.println("******************** CIERRE DEL DIA ********************");
-        System.out.println("VALOR RECOLECTADO: $" + ventas);
-        System.out.println(">>>>> GANANCIAS TOTALES: $" + ((foto_gana+ minu_venta) - costo));
-        System.out.println("      - OPERADORES: $" + total_venta_operador);
-        System.out.println("      - Minutos totales: " + minutos);
-        System.out.println("      - SIM Card: " + sim_card);
-        System.out.println("      - FOTOCOPIAS: $" + foto_gana);
-        System.out.println("***** COSTOS DE PRODUCCION: $" + costo);
+        System.out.println("\n----- IMPRESORAS -----");
+        for(int i=0; i<local.get_fotolista().size(); i++)
+        {
+            if(Objects.equals(local.get_fotolista().get(i).get_nombre(), "Plotter"))
+            {
+                System.out.println("Impresora: " + local.get_fotolista().get(i).get_nombre());
+                System.out.println("- Area plano: x" + local.get_fotolista().get(i).get_cantidad_plano());
+                System.out.println("- Area afiche: x" + local.get_fotolista().get(i).get_cantidad_afiche());
+                area += local.get_fotolista().get(i).get_cantidad_plano();
+                area += local.get_fotolista().get(i).get_cantidad_afiche();
+            }
+            else
+            {
+                System.out.println("Impresora: " + local.get_fotolista().get(i).get_nombre());
+                System.out.println("- Blanco y negro: x" + local.get_fotolista().get(i).get_cantidad_bn());
+                System.out.println("- Color: x" + local.get_fotolista().get(i).get_cantidad_c());
+                blanco_negro += local.get_fotolista().get(i).get_cantidad_bn();
+                color += local.get_fotolista().get(i).get_cantidad_c();
+            }
+        }
+
+
+
+        System.out.println("\n\n******************** CIERRE DEL DIA ********************");
+
+        System.out.println("OPERADORES: $" + (ganancia_operador));
+        System.out.println("- Minutos: x" + minutos);
+        System.out.println("- SIM Card: x" + sim_card);
+        System.out.println(">>>>> Costo produccion: $" + costo_operador);
+
+        System.out.println("FOTOCOPIAS: $" + ganancia_impresora);
+        System.out.println("- Hojas a blanco y negro: x" + blanco_negro);
+        System.out.println("- Hojas a color: x" + color);
+        System.out.println("- Area: x" + area);
+        System.out.println(">>>>> Costo produccion: $" + costo_impresora);
+
+        System.out.println("\n>>>>> GANANCIA TOTAL: $" + (ganancia_operador+ganancia_impresora) );
+        System.out.println("***** COSTOS TOTAL: $" + (costo_operador+costo_impresora) );
+
 
         // muestra el servicio mas rentable junto a sus ganancias
-        if(minu_venta > foto_gana)
+        if(ganancia_operador > ganancia_impresora)
         {
-            System.out.println("----- servicio mas rentable: MINUTOS ($" + minu_venta + ") -----");
+            System.out.println("----- servicio mas rentable: MINUTOS ($" + ganancia_operador + ") -----");
         }
-        else if(foto_gana > minu_venta)
+        else if(ganancia_impresora > ganancia_operador)
         {
-            System.out.println("----- servicio mas rentable: FOTOCOPIAS ($" + foto_gana + ") -----");
+            System.out.println("----- servicio mas rentable: FOTOCOPIAS ($" + ganancia_impresora + ") -----");
         }
         else
         {
